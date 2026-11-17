@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- Ban Simulator 2000 - fan-made recreation.
+     Original animation and game idea by MrBowlsey. Not affiliated with Roblox. -->
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,24 +12,21 @@
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none}
 html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:Verdana,"Trebuchet MS",sans-serif;touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 body{position:fixed;inset:0}
-#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden;background:#000}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden;overflow:clip;background:#000}  /* clip = can never be scrolled by oversized sprites */
 .screen{position:absolute;inset:0}
 .hidden{display:none!important}
 
-/* ---------- placeholder sprites ---------- */
-/* every loaded asset image fills its box, keeping its own proportions (never stretched) */
+/* ---------- sprites: every loaded asset fills its box, keeping its own proportions ---------- */
 img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}
-/* things that stand on the floor / hang from the meter stay anchored to the bottom of their box */
+/* things that stand on the floor / hang off the meter stay anchored to the bottom of their box */
 #davidSpr img.a,#pspr img.a,.thermo .ico img.a{object-position:50% 100%}
-/* buttons: the box is the click area; the picture can be bigger (e.g. a 1000x1000 png) and is centred on it */
-.dome img.a{inset:auto;left:50%;top:50%;width:var(--bw,380px);height:var(--bh,380px);transform:translate(-50%,calc(-50% + var(--bdy,0px)))}
+/* buttons: the box is the click area; the picture (e.g. a 1000x1000 png) is centred on it */
+.dome img.a{inset:auto;left:50%;top:50%;width:var(--bw,300px);height:var(--bh,300px);transform:translate(-50%,calc(-50% + var(--bdy,0px)))}
 .ph{background:repeating-linear-gradient(45deg,rgba(255,0,255,.35) 0 10px,rgba(60,0,60,.35) 10px 20px);border:2px dashed #fff;border-radius:8px}
 .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;color:#fff;font:bold 13px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;word-break:break-all;pointer-events:none}
 .nolabels .phl{display:none}
 .has-asset{background:none!important;border:none!important;box-shadow:none!important}
 .has-asset>.lbl{display:none!important}
-#splash .bar{position:absolute;left:50%;bottom:64px;width:360px;height:14px;transform:translateX(-50%);border:2px solid #bff5b8;border-radius:8px;overflow:hidden}
-#splash .bar i{display:block;height:100%;width:0;background:#bff5b8}
 
 /* ---------- 2000s glossy buttons / text ---------- */
 .gbtn{font:900 40px Impact,"Arial Black",sans-serif;letter-spacing:1px;color:#0a1a08;text-shadow:0 2px 0 rgba(255,255,255,.35);
@@ -41,7 +40,9 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 /* ---------- splash ---------- */
 #splash{background:radial-gradient(circle at 40% 40%,#1f8a2a,#0b4a12 80%);display:flex;align-items:center;justify-content:center;cursor:pointer}
 #splashLogo{width:560px;height:220px}
-#splash .sm{position:absolute;bottom:26px;width:100%;text-align:center;color:#bff5b8;font:16px Verdana;opacity:.8}
+#splash .sm{position:absolute;bottom:26px;width:100%;text-align:center;color:#bff5b8;font:16px Verdana;opacity:.9}
+#splash .bar{position:absolute;left:50%;bottom:64px;width:360px;height:14px;transform:translateX(-50%);border:2px solid #bff5b8;border-radius:8px;overflow:hidden}
+#splash .bar i{display:block;height:100%;width:0;background:#bff5b8}
 
 /* ---------- menu ---------- */
 #menu{background:linear-gradient(#1c8a25 0%,#2a7d20 35%,#a01414 75%,#d11a1a 100%)}
@@ -52,16 +53,16 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 #bSettings{left:240px;top:430px}
 #bExit{left:120px;top:560px}
 #menuChar{position:absolute;right:90px;bottom:30px;width:300px;height:480px}
-#credit{position:absolute;left:0;bottom:8px;width:100%;text-align:center;color:#fff;font:12px Verdana;text-shadow:1px 1px 0 #000;opacity:.9;padding:0 20px}
-#settings{position:absolute;left:380px;top:190px;width:520px;background:linear-gradient(#a21111,#6d0808);border:6px solid #3a0404;border-radius:26px;padding:26px;color:#fff;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.6)}
-#settings h2{font:900 38px Impact,sans-serif;color:#9cff7a;text-align:center;margin-bottom:18px;text-shadow:2px 2px 0 #000}
-#settings label{display:flex;gap:12px;align-items:center;font:bold 18px Verdana;margin:10px 0 22px;cursor:pointer}
-#settings input{width:22px;height:22px}
+#credit{position:absolute;left:0;bottom:8px;width:100%;text-align:center;color:#fff;font:14px Verdana;text-shadow:1px 1px 0 #000;opacity:.95;padding:0 20px}
+#settings{position:absolute;left:380px;top:150px;width:520px;background:linear-gradient(#a21111,#6d0808);border:6px solid #3a0404;border-radius:26px;padding:26px;color:#fff;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#settings h2{font:900 38px Impact,sans-serif;color:#9cff7a;text-align:center;margin-bottom:14px;text-shadow:2px 2px 0 #000}
+#settings label{display:flex;gap:12px;align-items:center;justify-content:space-between;font:bold 18px Verdana;margin:10px 0 18px;cursor:pointer}
+#settings input[type=checkbox]{width:22px;height:22px}
+#settings input[type=range]{width:240px;height:26px}
 
-/* ---------- game scene ---------- */
+/* ---------- game scene (fallback art is drawn from measurements of the original animation) ---------- */
 #game{background:#000}
-#bg{position:absolute;inset:0;background:
-  linear-gradient(#6aa8ee 0,#9fcdf6 300px,#c7e4fb 400px);overflow:hidden}
+#bg{position:absolute;inset:0;background:linear-gradient(#2a6fc4 0,#5a9be0 220px,#9fcdf6 410px);overflow:hidden}
 #bg .clouds{position:absolute;left:0;top:0;width:200%;height:400px;animation:drift 90s linear infinite;
   background:
   radial-gradient(ellipse 130px 36px at 100px 90px,#fff 60%,transparent 62%),
@@ -73,62 +74,70 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
   radial-gradient(ellipse 110px 30px at 1800px 80px,#fff 60%,transparent 62%);
   opacity:.9}
 @keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-#bg .bars{position:absolute;left:0;top:0;width:100%;height:410px;
-  background:repeating-linear-gradient(90deg,#0b1d6a 0 26px,transparent 26px 318px),
-  linear-gradient(#0b1d6a,#0b1d6a) 0 0/100% 18px no-repeat,
-  linear-gradient(#0b1d6a,#0b1d6a) 0 392px/100% 18px no-repeat}
-#bg .floor{position:absolute;left:0;top:410px;width:100%;height:310px;
+#bg .bars{position:absolute;left:0;top:0;width:100%;height:447px;
+  background:
+  linear-gradient(#0b1d6a,#0b1d6a) 0 0/98px 100% no-repeat,
+  linear-gradient(#0b1d6a,#0b1d6a) 416px 0/63px 100% no-repeat,
+  linear-gradient(#0b1d6a,#0b1d6a) 797px 0/63px 100% no-repeat,
+  linear-gradient(#0b1d6a,#0b1d6a) 1182px 0/98px 100% no-repeat,
+  linear-gradient(#0b1d6a,#0b1d6a) 0 407px/100% 40px no-repeat}
+#bg .floor{position:absolute;left:0;top:447px;width:100%;height:273px;
   background:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 3px,transparent 3px 120px),
-  linear-gradient(#8f8f8f,#5f5f5f)}
+  linear-gradient(#8f8f8f,#6a6a6a)}
 .sprAbs{position:absolute}
 
-#david{position:absolute;left:-260px;bottom:150px;width:160px;height:340px;transform-origin:50% 100%;
-  transform:translateX(-50%) scale(.9);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
+/* David: box is his "far away" size (~340px tall); closer = scaled up + moved down (see davidSet) */
+#david{position:absolute;left:-260px;bottom:200px;width:160px;height:340px;transform-origin:50% 100%;
+  transform:translateX(-50%) scale(1);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
 #david .bob{position:absolute;inset:0;animation:bob .55s infinite alternate ease-in-out}
 @keyframes bob{to{transform:translateY(-6px)}}
 
-#player{position:absolute;left:50%;bottom:128px;width:320px;height:360px;transform:translateX(-50%);z-index:3;cursor:pointer;animation:rise .45s ease-out}
+/* player: big upper body behind the desk like the original (head ~150px wide); the legs hide behind the desk */
+#player{position:absolute;left:50%;top:270px;width:420px;height:760px;transform:translateX(-50%);z-index:3;cursor:pointer;animation:rise .45s ease-out}
 #player.out-ban{animation:dropOut .65s ease-in forwards;pointer-events:none}
 #player.out-ok{animation:hopOut .65s ease-in forwards;pointer-events:none}
-@keyframes rise{from{transform:translate(-50%,110%)}to{transform:translate(-50%,0)}}
-@keyframes dropOut{to{transform:translate(-50%,160%) rotate(25deg)}}
+@keyframes rise{from{transform:translate(-50%,60%)}to{transform:translate(-50%,0)}}
+@keyframes dropOut{to{transform:translate(-50%,60%) rotate(25deg)}}
 @keyframes hopOut{30%{transform:translate(-50%,-30px)}to{transform:translate(-50%,-20px) scale(.2);opacity:0}}
 #player .tag{position:absolute;top:-26px;left:0;width:100%;text-align:center;color:#fff;font:bold 15px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;z-index:2}
 
-#desk{position:absolute;left:0;bottom:0;width:1280px;height:170px;z-index:5;pointer-events:none;
+#desk{position:absolute;left:0;bottom:0;width:1280px;height:130px;z-index:5;pointer-events:none;
   background:linear-gradient(#d9bb94 0,#c9a67c 14px,#b08c63 100%);border-top:6px solid #8f6c45;box-shadow:0 -6px 14px rgba(0,0,0,.35)}
-.dome{position:absolute;bottom:34px;width:300px;height:130px;z-index:6;cursor:pointer;transition:transform .07s}
+.dome{position:absolute;bottom:40px;width:297px;height:130px;z-index:6;cursor:pointer;transition:transform .07s}
 .dome:active{transform:translateY(5px) scale(.98)}
-.dome.red{left:110px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#ff9a8c,#e23a22 45%,#9a1608 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
-.dome.green{right:110px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#c9ff9c,#52c92a 45%,#1e7a0a 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
+.dome.red{left:172px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#ff9a8c,#e23a22 45%,#9a1608 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
+.dome.green{left:810px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#c9ff9c,#52c92a 45%,#1e7a0a 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
 .dome:hover{filter:brightness(1.12)}
 .dome .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 30px Impact,sans-serif;color:rgba(255,255,255,.9);text-shadow:2px 2px 0 rgba(0,0,0,.4);pointer-events:none;padding-bottom:20px}
 
-/* Proportions measured from the original animation: icon ~90-110px wide and up to ~150px tall
-   (David's head+neck is tall), sitting right on top of a ~46px wide, ~300px tall tube. */
+/* Thermometers. Proportions measured from the original: icon ~87px wide, 100px (smiley) / 133px (David) tall,
+   sitting right on a ~52px wide, ~297px tall tube. Centres at x=166 and x=1113. */
 .thermo{position:absolute;top:56px;width:120px;height:470px;z-index:7;pointer-events:none}
-.thermo.left{left:44px}.thermo.right{right:44px}
-.thermo .ico{position:absolute;left:0;top:0;width:120px;height:170px;z-index:2}
-.thermo .tube{position:absolute;left:37px;top:160px;width:46px;height:300px;background:linear-gradient(90deg,#c7e5ff,#fff 40%,#d7ecff);border:5px solid #0b0b0b;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 6px rgba(0,0,0,.35)}
-.thermo .fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(90deg,#a40000,#ff2a2a 45%,#d00000)}
+.thermo.left{left:106px}.thermo.right{left:1053px}
+.thermo .ico{position:absolute;left:15px;top:32px;width:90px;height:134px;z-index:2}
+.thermo .tube{position:absolute;left:34px;top:167px;width:52px;height:297px;background:linear-gradient(#cfe8ff,#fff 22%,#eaf5ff);border:5px solid #000;border-radius:26px;overflow:hidden}
+.thermo .fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(90deg,#d60000,#ff1a1a 45%,#e00000)}
+/* when a meter is completely full the red shoots out of the top of the thermometer and off the screen */
+.thermo .over{position:absolute;left:39px;width:42px;top:-80px;height:285px;background:linear-gradient(90deg,#d60000,#ff1a1a 45%,#e00000);transform:scaleY(0);transform-origin:50% 100%;z-index:1}
+.thermo.max .over{transform:scaleY(1);transition:transform .45s cubic-bezier(.15,.85,.2,1)}
 .thermo.bump{animation:bump .3s}
 @keyframes bump{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 
-#hint{position:absolute;left:0;bottom:178px;width:100%;text-align:center;z-index:9;color:#fff;font:bold 20px Verdana;text-shadow:2px 2px 0 #000;animation:pulse 1s infinite alternate;pointer-events:none}
+#hint{position:absolute;left:0;bottom:190px;width:100%;text-align:center;z-index:9;color:#fff;font:bold 20px Verdana;text-shadow:2px 2px 0 #000;animation:pulse 1s infinite alternate;pointer-events:none}
 @keyframes pulse{from{opacity:.55}to{opacity:1}}
 #tooLong{position:absolute;left:0;top:34px;width:100%;text-align:center;z-index:12;font:italic 46px "Trebuchet MS",Verdana,sans-serif;color:#d6e8ff;text-shadow:3px 3px 0 #0b1d6a,0 0 12px #6aa8ee;pointer-events:none;animation:shake .25s infinite}
 @keyframes shake{25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
 #hud{position:absolute;left:0;top:6px;width:100%;text-align:center;z-index:8;color:#fff;font:bold 14px Verdana;text-shadow:1px 1px 0 #000;pointer-events:none}
 #dbg{position:absolute;left:6px;bottom:4px;z-index:50;color:#0f0;font:11px monospace;background:rgba(0,0,0,.6);padding:2px 4px;pointer-events:none}
 
-#paperWrap{position:absolute;inset:0;z-index:8;pointer-events:none}
 /* paper_scene.png = ONE full-stage (1280x720) overlay with the paper AND both hands.
-   #paper is just the invisible click area + text box placed over the paper (set in CFG.paper). */
+   #paper is only the invisible click area + text box over the paper (rect set in CFG.paper). */
+#paperWrap{position:absolute;inset:0;z-index:8;pointer-events:none}
 #paperScene{position:absolute;inset:0;pointer-events:none}
-#paper{position:absolute;left:415px;top:57px;width:450px;height:626px;background:linear-gradient(#fff,#f1f1f1);border:1px solid #ccc;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;pointer-events:auto;text-align:center;padding-top:44px}
+#paper{position:absolute;left:430px;top:57px;width:450px;height:626px;background:linear-gradient(#fff,#f1f1f1);border:1px solid #ccc;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;pointer-events:auto;text-align:center;padding-top:44px}
 #paper.art{background:none;border:none;box-shadow:none}
-#paper .h{font:34px "Segoe Print","Comic Sans MS",cursive;color:#111}
-#paper #reason{margin-top:46px;padding:0 28px;font:42px "Segoe Print","Comic Sans MS",cursive;color:#111;word-wrap:break-word;line-height:1.25}
+#paper .h{font:44px "Segoe Print","Comic Sans MS",cursive;color:#111}
+#paper #reason{margin-top:46px;padding:0 28px;font:50px "Segoe Print","Comic Sans MS",cursive;color:#111;word-wrap:break-word;line-height:1.2}
 #paper .foot,#paper .miss{position:absolute;width:100%;left:0;text-align:center}
 #paper .foot{bottom:14px;font:12px Verdana;color:#999}
 #paper .miss{bottom:60px;color:#fff;font:bold 13px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000}
@@ -139,14 +148,13 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 #flash{position:absolute;inset:0;z-index:15;background:radial-gradient(circle,transparent 40%,rgba(255,0,0,.55));opacity:0;pointer-events:none;transition:opacity .35s}
 #flash.on{opacity:1;transition:none}
 
-#tip{position:absolute;left:260px;top:60px;width:700px;height:360px;z-index:30;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
+#tip{position:absolute;left:290px;top:60px;width:700px;height:360px;z-index:30;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
 #tipBox{position:absolute;inset:0;background:linear-gradient(#1e9a1e,#157a15);border:14px solid #b01010;border-radius:34px;box-shadow:inset 0 0 0 4px #5e0707}
 #tip .ttl{position:absolute;left:150px;top:6px;font:900 30px Impact,sans-serif;color:#7dff52;text-shadow:2px 2px 0 #043604;letter-spacing:1px;z-index:3}
 #tip #helpy{position:absolute;left:-30px;top:-34px;width:100px;height:100px;z-index:4;border-radius:50%;border:5px solid #b01010;background:#223}
 #tip .txt{position:absolute;left:44px;right:44px;top:62px;bottom:70px;color:#fff;font:24px "Trebuchet MS",Verdana,sans-serif;line-height:1.3;z-index:3;white-space:pre-line}
 #tipOk{position:absolute;right:34px;bottom:22px;z-index:4;font:900 28px Impact,sans-serif;color:#fff;background:#8f0a0a;border:3px solid #3a0000;border-radius:20px;padding:2px 22px;cursor:pointer;box-shadow:0 4px 0 #3a0000}
 #tipOk:hover{background:#c01010}
-#tip.hasasset #tipBox{background:none;border:none;box-shadow:none}
 
 /* ---------- game over ---------- */
 #over{background:#000;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#d8e22a;font:40px "Trebuchet MS",Verdana,sans-serif;padding:60px}
@@ -176,7 +184,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 <body>
 <div id="stage">
 
-  <!-- SPLASH -->
+  <!-- SPLASH (also the loading screen) -->
   <div id="splash" class="screen">
     <div id="splashLogo" class="spr"></div>
     <div class="bar"><i id="loadFill"></i></div>
@@ -193,7 +201,9 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
     <div id="credit"></div>
     <div id="settings" class="hidden">
       <h2>SETTINGS</h2>
-      <label><input type="checkbox" id="optLabels" checked> Show placeholder labels</label>
+      <label>Music <input type="range" id="optMusic" min="0" max="100" value="60"></label>
+      <label>Sound effects <input type="range" id="optSfx" min="0" max="100" value="80"></label>
+      <label>Show placeholder labels <input type="checkbox" id="optLabels" checked></label>
       <div style="text-align:center"><button class="gbtn small" id="bBack">BACK</button></div>
     </div>
   </div>
@@ -211,7 +221,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
     <div id="btnOk" class="dome green"><div class="lbl">APPEAL</div></div>
 
     <div id="thermoL" class="thermo left"><div class="ico spr" id="icoL"></div><div class="tube"><div class="fill" id="fillL"></div></div></div>
-    <div id="thermoR" class="thermo right"><div class="ico spr" id="icoR"></div><div class="tube"><div class="fill" id="fillR"></div></div></div>
+    <div id="thermoR" class="thermo right"><div class="over"></div><div class="ico spr" id="icoR"></div><div class="tube"><div class="fill" id="fillR"></div></div></div>
 
     <div id="hud"></div>
     <div id="hint" class="hidden">Click the player to read their ban reason</div>
@@ -242,7 +252,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
     </div>
   </div>
 
-  <!-- GAME OVER -->
+  <!-- GAME OVER (community) -->
   <div id="over" class="screen hidden">
     <div class="big" id="overMsg"></div>
     <div class="sc" id="overScore"></div>
@@ -257,10 +267,11 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 <script>
 /* =====================================================================
    BAN SIMULATOR 2000  -  prototype
-   All tunables live in CFG. All icons live in Assets/ (see ASSETS).
+   Original animation and game idea by MrBowlsey.
+   All tunables live in CFG. Images live in Assets/, sounds in Assets/SFX/.
    ===================================================================== */
 const CFG = {
-  credit: 'Fan-made recreation of the animation "Ban Simulator 2000" — original animation by [ADD CREATOR NAME HERE]. Not affiliated with Roblox.',
+  credit: 'Based on the original animation "Ban Simulator 2000" - original game idea by MrBowlsey. Fan-made recreation, not affiliated with Roblox.',
 
   // thermometers (0-100). You lose when either one reaches 100.
   banCommunity: 10,        // left meter: +this per ban
@@ -272,6 +283,8 @@ const CFG = {
   rageRate: 140,           // meter fill speed during rage
   furiousAt: 70,           // "David is furious" tip
   peekAt: 55,              // right meter level where David starts peeking behind the paper
+  commIconAt: [33, 66],    // left icon: happy < 33 <= meh < 66 <= angry   (angry.mp3 plays from "meh" up)
+  davIconAt:  [35, 70],    // right icon: calm < 35 <= mad < 70 <= furious (furious.mp3 plays when furious appears)
 
   // slow decisions
   tooLongAfter: 8,         // seconds before the community gets angry
@@ -285,7 +298,15 @@ const CFG = {
   ambushStay: 3.2,                // seconds he stays close on the right
   postAmbushAway: 4.5,            // safe window after the ambush
 
-  nextPlayerDelay: 1.1
+  nextPlayerDelay: 1.1,
+
+  // paper_scene.png layout (stage px, stage is 1280x720). l/t/w/h = the paper's rectangle inside your png.
+  // Set showHeading to false if "Offensive Item:" is already drawn in your png.
+  paper: { l: 430, t: 57, w: 450, h: 626, showHeading: true },
+
+  // size in px the button picture is drawn at (it is centred on the click area). A 1000x1000 png whose dome
+  // spans the full width of the image looks right at ~300. Raise it if your dome has transparent padding.
+  buttonImg: 300
 };
 
 const ASSETS = {
@@ -294,14 +315,18 @@ const ASSETS = {
   david:'david_body.png',
   davidIcons:['david_icon_calm.png','david_icon_mad.png','david_icon_furious.png'],
   commIcons:['community_icon_happy.png','community_icon_meh.png','community_icon_angry.png'],
-  helpy:'helpy.png', tipPanel:'tips_panel.png', paper:'paper.png',
-  handL:'hands_paper_left.png', handR:'hands_paper_right.png',
-  dgo:'david_gameover.png',               // zooms in from the middle when David's meter fills
-  irreg:'game_over_irregularity.png'      // full-screen "An irregularity has been detected" screen
+  helpy:'helpy.png', tipPanel:'tips_panel.png',
+  paperScene:'paper_scene.png',            // ONE png: paper + both hands (1280x720, transparent)
+  dgo:'david_gameover.png',                // zooms in from the middle when David's meter fills
+  irreg:'game_over_irregularity.png'       // full-screen "An irregularity has been detected" screen
 };
+const DIR = 'Assets/';
+const SFX_DIR = 'Assets/SFX/';
+const SFX_FILES = { click:'click.mp3', hover:'hover.mp3', angry:'angry.mp3', ohno:'ohno.mp3', furious:'furious.mp3', helpy:'helpy.mp3', scream:'scream.mp3' };
+const MUSIC_FILES = { start:'start_music.mp3', main:'main_music.mp3' };
+
 const isTouch = matchMedia('(hover:none)').matches;
 const CLICK = isTouch ? 'Tap' : 'Click';
-const DIR = 'Assets/';
 
 const PLAYERS = [
   {f:'player_1.png',n:'NoobMaster_2003'},{f:'player_2.png',n:'xX_CoolGuy_Xx'},
@@ -317,27 +342,131 @@ const TIPS = {
   furious:"David is furious now!\nHe'll start peeking at the papers you read.\nOne more slip and it's game over!"
 };
 
-/* ---------------- sprites with placeholder fallback ---------------- */
-function attach(parent,file,label,quiet){
-  if(parent.dataset.file===file) return;
-  parent.dataset.file=file;
-  parent.querySelectorAll(':scope>img.a,:scope>.phl').forEach(e=>e.remove());
-  parent.classList.remove('ph','has-asset');
-  if(getComputedStyle(parent).position==='static') parent.style.position='relative';
-  let lab=null;
-  if(!quiet){ parent.classList.add('ph'); lab=document.createElement('span'); lab.className='phl'; lab.textContent=label||file; parent.appendChild(lab); }
-  const img=new Image(); img.className='a'; img.draggable=false; img.alt='';
-  img.onload=()=>{ parent.classList.remove('ph'); parent.classList.add('has-asset'); if(lab) lab.remove(); };
-  img.onerror=()=>{ img.remove(); };
-  img.src=DIR+file;
-  parent.appendChild(img);
-}
 const $=id=>document.getElementById(id);
 const rnd=(a,b)=>a+Math.random()*(b-a);
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 
+/* ---------------- image cache + sprites with placeholder fallback ---------------- */
+const CACHE={};   // file -> {ok, img}   (filled by preload(), so sprites appear instantly)
+const FILES=[...new Set([].concat(...Object.values(ASSETS).map(v=>Array.isArray(v)?v:[v]),PLAYERS.map(p=>p.f)))];
+
+function preload(onProgress){
+  let done=0; const total=FILES.length;
+  return Promise.all(FILES.map(f=>new Promise(res=>{
+    const img=new Image();
+    const fin=ok=>{ CACHE[f]={ok,img}; done++; onProgress(Math.round(done/total*100)); res(); };
+    img.onload=()=>{ (img.decode?img.decode():Promise.resolve()).then(()=>fin(true),()=>fin(true)); };
+    img.onerror=()=>fin(false);
+    img.src=DIR+f;
+  })));
+}
+function addPh(parent,txt){
+  parent.classList.add('ph');
+  const l=document.createElement('span'); l.className='phl'; l.textContent=txt; parent.appendChild(l); return l;
+}
+// cb(ok) is called with whether the real image is being shown
+function attach(parent,file,label,quiet,cb){
+  if(parent.dataset.file===file){ if(cb) cb(parent.classList.contains('has-asset')); return; }
+  parent.dataset.file=file;
+  parent.querySelectorAll(':scope>img.a,:scope>.phl').forEach(e=>e.remove());
+  parent.classList.remove('ph','has-asset');
+  if(getComputedStyle(parent).position==='static') parent.style.position='relative';
+  const c=CACHE[file];
+  if(c){                                         // preloaded: synchronous, no flicker
+    if(c.ok){
+      const img=c.img.cloneNode(); img.className='a'; img.draggable=false; img.alt='';
+      parent.appendChild(img); parent.classList.add('has-asset'); if(cb) cb(true);
+    }else{ if(!quiet) addPh(parent,label||file); if(cb) cb(false); }
+    return;
+  }
+  const lab=quiet?null:addPh(parent,label||file); // not preloaded yet (splash only): async path
+  const img=new Image(); img.className='a'; img.draggable=false; img.alt='';
+  img.onload=()=>{ parent.classList.remove('ph'); parent.classList.add('has-asset'); if(lab) lab.remove(); if(cb) cb(true); };
+  img.onerror=()=>{ img.remove(); if(cb) cb(false); };
+  img.src=DIR+file; parent.appendChild(img);
+}
+
+/* ---------------- audio ---------------- */
+const AU={sfx:{},music:{}};
+function loadAudio(dir,file,loop){
+  const a=new Audio(); a.preload='auto'; a.loop=!!loop; a.dataset.ok='1';
+  a.addEventListener('error',()=>{ a.dataset.ok='0'; });
+  a.src=dir+file; try{ a.load(); }catch(e){}
+  return a;
+}
+Object.keys(SFX_FILES).forEach(k=>AU.sfx[k]=loadAudio(SFX_DIR,SFX_FILES[k],false));
+Object.keys(MUSIC_FILES).forEach(k=>AU.music[k]=loadAudio(SFX_DIR,MUSIC_FILES[k],true));
+const VOL={music:.6,sfx:.8};
+try{ const s=JSON.parse(localStorage.getItem('bs2000vol')||'null'); if(s){ VOL.music=s.music; VOL.sfx=s.sfx; } }catch(e){}
+let unlocked=false, helpyHold=false, helpyAudio=null, curMusic=null, wantMusic='start';
+const activeSfx=new Set();
+
+function sfx(name){
+  const base=AU.sfx[name];
+  if(!unlocked||!base||base.dataset.ok==='0') return null;
+  const a=base.cloneNode(); a.volume=VOL.sfx; activeSfx.add(a);
+  const end=()=>activeSfx.delete(a);
+  a.addEventListener('ended',end); a.addEventListener('error',end);
+  const p=a.play(); if(p&&p.catch) p.catch(end);
+  return a;
+}
+function stopAllSfx(){ activeSfx.forEach(a=>{ try{a.pause();}catch(e){} }); activeSfx.clear(); }
+function setMusicVol(){ Object.values(AU.music).forEach(m=>{ m.volume=VOL.music; }); }
+function playMusic(name){
+  wantMusic=name;
+  if(!unlocked) return;
+  const m=AU.music[name];
+  if(curMusic && curMusic!==m){ curMusic.pause(); try{curMusic.currentTime=0;}catch(e){} }
+  curMusic=m||null;
+  if(m && m.dataset.ok!=='0' && !helpyHold){ m.volume=VOL.music; if(m.paused){ const p=m.play(); if(p&&p.catch) p.catch(()=>{}); } }
+}
+function stopMusic(){
+  wantMusic=null;
+  if(curMusic){ curMusic.pause(); try{curMusic.currentTime=0;}catch(e){} }
+  curMusic=null;
+}
+// browsers only allow sound after a first click / key press
+function unlockAudio(){ if(unlocked) return; unlocked=true; if(wantMusic) playMusic(wantMusic); }
+addEventListener('pointerdown',unlockAudio,true);
+addEventListener('keydown',unlockAudio,true);
+document.addEventListener('visibilitychange',()=>{
+  if(!curMusic) return;
+  if(document.hidden) curMusic.pause();
+  else if(!helpyHold && unlocked){ const p=curMusic.play(); if(p&&p.catch) p.catch(()=>{}); }
+});
+
+// Helpy: pauses all other music + sfx while a tip is open
+function helpyStart(){
+  helpyHold=true;
+  if(curMusic) curMusic.pause();
+  stopAllSfx();
+  const h=sfx('helpy'); helpyAudio=h;
+  if(h) h.addEventListener('ended',()=>{ if(helpyAudio===h) helpyAudio=null; });
+}
+function helpyEnd(){
+  helpyHold=false;
+  if(helpyAudio){ try{helpyAudio.pause();}catch(e){} helpyAudio=null; }
+  if(curMusic && unlocked){ const p=curMusic.play(); if(p&&p.catch) p.catch(()=>{}); }
+}
+
+// hover.mp3 / click.mp3 for every button
+const btnOf=t=>t&&t.closest?t.closest('button,.dome'):null;
+document.addEventListener('pointerover',e=>{
+  if(e.pointerType!=='mouse') return;
+  const b=btnOf(e.target);
+  if(b && !(e.relatedTarget && b.contains(e.relatedTarget)) && !helpyAudio) sfx('hover');
+});
+document.addEventListener('pointerdown',e=>{ if(btnOf(e.target)) sfx('click'); });
+
+// settings sliders
+$('optMusic').value=Math.round(VOL.music*100); $('optSfx').value=Math.round(VOL.sfx*100); setMusicVol();
+function saveVol(){ try{ localStorage.setItem('bs2000vol',JSON.stringify(VOL)); }catch(e){} }
+$('optMusic').oninput=e=>{ VOL.music=e.target.value/100; setMusicVol(); saveVol(); };
+$('optSfx').oninput=e=>{ VOL.sfx=e.target.value/100; saveVol(); };
+
 /* ---------------- screens ---------------- */
 function show(id){ ['splash','menu','game','over','exitScr'].forEach(s=>$(s).classList.toggle('hidden',s!==id)); }
+function toMenu(){ show('menu'); playMusic('start'); }
 function fit(){
   const w=innerWidth,h=innerHeight, s=Math.min(w/1280,h/720);
   $('stage').style.transform=`translate(-50%,-50%) scale(${s})`;
@@ -363,86 +492,102 @@ $('fsBtn').onclick=toggleFs;
 document.addEventListener('fullscreenchange',updFs); document.addEventListener('webkitfullscreenchange',updFs);
 addEventListener('keydown',e=>{ if(e.code==='KeyF'&&!e.ctrlKey&&!e.metaKey&&!e.altKey) toggleFs(); });
 
+/* ---------------- splash / loading / menu ---------------- */
 attach($('splashLogo'),ASSETS.splashLogo,'roblox_logo.png');
 attach($('menuChar'),ASSETS.menuChar,'menu_character.png');
 $('credit').textContent=CFG.credit;
-$('splash').onclick=()=>{ clearTimeout(splashT); show('menu'); };
-const splashT=setTimeout(()=>{ if(!$('splash').classList.contains('hidden')) show('menu'); },2600);
+let loaded=false;
+function finishLoading(){ if(loaded) return; loaded=true; $('loadFill').style.width='100%'; $('loadTxt').textContent='click to continue'; }
+preload(p=>{ $('loadFill').style.width=p+'%'; $('loadTxt').textContent='Loading… '+p+'%'; })
+  .then(()=>new Promise(r=>setTimeout(r,700))).then(finishLoading);
+setTimeout(finishLoading,25000);   // safety: never get stuck on a slow connection
+function leaveSplash(){ if(loaded && !$('splash').classList.contains('hidden')) toMenu(); }
+$('splash').onclick=leaveSplash;
+addEventListener('keydown',leaveSplash);
 $('bPlay').onclick=startGame;
 $('bSettings').onclick=()=>$('settings').classList.remove('hidden');
 $('bBack').onclick=()=>$('settings').classList.add('hidden');
 $('optLabels').onchange=e=>document.body.classList.toggle('nolabels',!e.target.checked);
 $('bExit').onclick=()=>show('exitScr');
-$('exitScr').onclick=()=>show('menu');
+$('exitScr').onclick=toMenu;
 $('bRetry').onclick=startGame;
-$('bMenu').onclick=()=>show('menu');
+$('bMenu').onclick=toMenu;
 
 /* ---------------- game state ---------------- */
 let G={}, D={}, overToken=0;
 const SEEN={};                       // tips are shown once per page load
-const PAPER={l:430,r:850};
+const P=CFG.paper;
 function best(){ try{return +localStorage.getItem('bs2000best')||0}catch(e){return 0} }
 function saveBest(v){ try{localStorage.setItem('bs2000best',v)}catch(e){} }
+const tipQueue=[];
 
 function startGame(){
-  G={running:true,paused:false,over:false,comm:0,commShown:0,dav:0,davShown:0,rage:false,
-     player:null,paperOpen:false,decideT:0,processed:0,spawnT:0.6,tipsSeen:SEEN,tipOpen:false,readOnce:false,canRestart:false};
+  G={running:true,paused:false,over:false,comm:0,commShown:0,dav:0,davShown:0,rage:false,davIdx:0,
+     player:null,paperOpen:false,decideT:0,processed:0,spawnT:0.6,tipsSeen:SEEN,tipOpen:false,readOnce:false,canRestart:false,lastAngry:-9};
   D={mode:'away',t:rnd(2,4),tick:0};
   overToken++; tipQueue.length=0;
+  stopAllSfx(); helpyHold=false; helpyAudio=null;
   show('game');
   $('over').classList.add('hidden');
   $('game').classList.remove('gameover-dav');
+  $('thermoR').classList.remove('max');
   $('dgo').classList.add('hidden'); $('irreg').classList.add('hidden'); $('dgoImg').classList.remove('zoom');
   $('hint').textContent=CLICK+' the player to read their ban reason';
   $('paper').querySelector('.foot').textContent='('+CLICK.toLowerCase()+' to put down)';
+  // layout numbers from CFG
+  const ps=$('paper').style; ps.left=P.l+'px'; ps.top=P.t+'px'; ps.width=P.w+'px'; ps.height=P.h+'px';
+  $('paper').classList.toggle('noheading',!P.showHeading);
+  document.documentElement.style.setProperty('--bw',CFG.buttonImg+'px');
+  document.documentElement.style.setProperty('--bh',CFG.buttonImg+'px');
+  // sprites (preloaded, so these are instant)
   attach($('bgImg'),ASSETS.bg,'bg_room.png',true);
   attach($('desk'),ASSETS.desk,'desk.png',true);
   attach($('btnBan'),ASSETS.btnBan,'button_ban.png',true);
   attach($('btnOk'),ASSETS.btnOk,'button_unban.png',true);
   attach($('davidSpr'),ASSETS.david,'david_body.png');
   attach($('helpy'),ASSETS.helpy,'helpy.png');
-  attach($('handL'),ASSETS.handL,'hands_paper_left.png');
-  attach($('handR'),ASSETS.handR,'hands_paper_right.png');
   attach($('tipBox'),ASSETS.tipPanel,'tips_panel.png',true);
-  $('tip').classList.toggle('hasasset',$('tipBox').classList.contains('has-asset'));
-  $('paper').dataset.file=''; attach($('paper'),ASSETS.paper,'paper.png',true);
+  attach($('paperScene'),ASSETS.paperScene,'paper_scene.png',true,ok=>$('paper').classList.toggle('art',ok));
   $('paperWrap').classList.add('hidden'); $('player').classList.add('hidden');
   $('hint').classList.add('hidden'); $('tooLong').classList.add('hidden');
   $('dbg').classList.toggle('hidden',!location.search.includes('debug'));
-  davidSet(-240,.8,0,0.01);
-  updateHud(); renderMeters(true);
+  davidSet(-260,1,0,0.01,0);
+  updateHud(); renderMeters();
+  playMusic('main');
   showTip('intro');
 }
 
-/* ---------------- tips ---------------- */
-const tipQueue=[];
-function showTip(key){
-  if(G.tipsSeen[key]) return; G.tipsSeen[key]=true;
-  if(G.tipOpen){ tipQueue.push(key); G.tipsSeen[key]=true; return; }
+/* ---------------- tips (Helpy) ---------------- */
+function openTip(key){
   G.tipOpen=true; G.paused=true;
   $('tipTxt').textContent=TIPS[key]; $('tip').classList.remove('hidden');
+  helpyStart();
+}
+function showTip(key){
+  if(G.tipsSeen[key]) return; G.tipsSeen[key]=true;
+  if(G.tipOpen) tipQueue.push(key); else openTip(key);
 }
 $('tipOk').onclick=()=>{
-  $('tip').classList.add('hidden'); G.tipOpen=false;
-  if(tipQueue.length){ const k=tipQueue.shift(); G.tipsSeen[k]=false; showTip(k); }
-  else G.paused=false;
+  if(tipQueue.length){ openTip(tipQueue.shift()); return; }
+  $('tip').classList.add('hidden'); G.tipOpen=false; G.paused=false; helpyEnd();
 };
 
 /* ---------------- David ---------------- */
-function davidSet(x,scale,rot,dur){
+// x = centre (stage px); scale 1 = "far away" (340px tall); dy pushes his feet down (closer to the desk)
+function davidSet(x,scale,rot,dur,dy){
   const el=$('david'); el.style.setProperty('--d',dur+'s');
-  el.style.left=x+'px'; el.style.transform=`translateX(-50%) scale(${scale}) rotate(${rot}deg)`;
+  el.style.left=x+'px'; el.style.transform=`translateX(-50%) translateY(${dy||0}px) scale(${scale}) rotate(${rot}deg)`;
 }
 const watching=()=>['wander','ambush','peek'].includes(D.mode);
 function enterWander(){ D.mode='wander'; D.t=rnd(CFG.wanderMin,CFG.wanderMax); D.tick=0; }
-function enterAway(t){ D.mode='away'; D.t=t||rnd(CFG.awayMin,CFG.awayMax); davidSet(-240,.8,0,1.0); }
+function enterAway(t){ D.mode='away'; D.t=t||rnd(CFG.awayMin,CFG.awayMax); davidSet(-260,1,0,1.0,0); }
 function enterAmbush(){
   D.mode='ambush'; D.t=CFG.ambushStay;
-  davidSet(1450,1.6,0,0.01); $('david').offsetWidth; davidSet(1000,1.6,0,0.35);
+  davidSet(1450,1.73,0,0.01,120); $('david').offsetWidth; davidSet(990,1.73,0,0.35,120);   // pops in close, on the right
 }
 function enterPeek(){
   D.mode='peek'; const left=Math.random()<.5;
-  davidSet(left?PAPER.l+25:PAPER.r-25,1.3,left?-45:45,0.5);
+  davidSet(left?P.l+25:P.l+P.w-25,1.5,left?-45:45,0.5,40);
 }
 function updateDavid(dt){
   const want=G.paperOpen && G.dav>=CFG.peekAt;
@@ -452,7 +597,7 @@ function updateDavid(dt){
   switch(D.mode){
     case 'wander':
       D.tick-=dt;
-      if(D.tick<=0){ D.tick=rnd(2,3.2); davidSet(rnd(300,1000),rnd(.75,.95),0,D.tick*.95); }
+      if(D.tick<=0){ D.tick=rnd(2,3.2); const d=Math.random(); davidSet(rnd(260,1020),1+.5*d,0,D.tick*.95,70*d); }
       if(D.t<=0) enterAway();
       break;
     case 'away': if(D.t<=0) enterWander(); break;
@@ -489,23 +634,28 @@ $('player').onclick=()=>{ if(G.paused||G.over) return; G.paperOpen?closePaper():
 $('paper').onclick=()=>{ if(G.paused||G.over) return; closePaper(); };
 addEventListener('keydown',e=>{ if(e.code==='Space'&&G.running&&!G.paused&&!G.over){ e.preventDefault(); G.paperOpen?closePaper():openPaper(); } });
 
-function leave(kind){
-  const el=$('player'); el.classList.add(kind==='ban'?'out-ban':'out-ok');
-}
+function leave(kind){ $('player').classList.add(kind==='ban'?'out-ban':'out-ok'); }
 function bump(id){ const e=$(id); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
 function flash(){ const f=$('flash'); f.classList.add('on'); setTimeout(()=>f.classList.remove('on'),60); }
+
+// angry.mp3: whenever the community meter goes up while its icon is "meh" or higher
+function angrySfx(minGap){
+  const now=performance.now()/1000;
+  if(G.comm>=CFG.commIconAt[0] && now-G.lastAngry>=minGap){ G.lastAngry=now; sfx('angry'); }
+}
 
 function decide(kind){
   if(!G.running||G.paused||G.over||!G.player) return;
   if(G.comm>=100||G.dav>=100) return;      // a meter is already full: it's over, no last-second saves
   G.player=null; G.processed++; closePaper(); $('hint').classList.add('hidden');
   if(kind==='ban'){
-    G.comm=Math.min(100,G.comm+CFG.banCommunity); bump('thermoL'); leave('ban'); showTip('firstBan');
+    G.comm=Math.min(100,G.comm+CFG.banCommunity); bump('thermoL'); angrySfx(0);
+    leave('ban'); showTip('firstBan');
   }else{
     if(watching()){
       if(D.mode==='ambush'){ G.dav=Math.min(100,G.dav+CFG.appealRage); G.rage=true; }
       else G.dav=Math.min(100,G.dav+CFG.appealWatching);
-      bump('thermoR'); flash(); showTip('firstSaw');
+      bump('thermoR'); flash(); sfx('ohno'); showTip('firstSaw');
     }else{
       G.comm=Math.max(0,G.comm-CFG.appealCalm);
     }
@@ -518,27 +668,33 @@ $('btnOk').onclick=()=>decide('ok');
 
 /* ---------------- meters ---------------- */
 function approach(cur,target,up,down,dt){ return cur<target?Math.min(target,cur+up*dt):Math.max(target,cur-down*dt); }
-function renderMeters(force){
+const iconIdx=(v,th)=>v<th[0]?0:v<th[1]?1:2;
+function renderMeters(){
   $('fillL').style.height=G.commShown+'%'; $('fillR').style.height=G.davShown+'%';
-  attach($('icoL'),ASSETS.commIcons[G.commShown<33?0:G.commShown<66?1:2],'community_icon');
-  attach($('icoR'),ASSETS.davidIcons[G.davShown<35?0:G.davShown<70?1:2],'david_icon');
+  const ci=iconIdx(G.commShown,CFG.commIconAt), di=iconIdx(G.davShown,CFG.davIconAt);
+  attach($('icoL'),ASSETS.commIcons[ci],['community_icon_happy','community_icon_meh','community_icon_angry'][ci]);
+  attach($('icoR'),ASSETS.davidIcons[di],['david_icon_calm','david_icon_mad','david_icon_furious'][di]);
+  if(di===2 && G.davIdx!==2) sfx('furious');          // furious.mp3 the moment the furious icon appears
+  G.davIdx=di;
 }
 function updateHud(){ $('hud').textContent=`Accounts reviewed: ${G.processed}   |   Best: ${Math.max(best(),G.processed)}`; }
 
 function lose(cause){
   if(G.over) return; G.over=true; G.running=false;
   closePaper(); $('tooLong').classList.add('hidden'); $('hint').classList.add('hidden');
+  stopMusic();
   if(G.processed>best()) saveBest(G.processed);
   const score=`Accounts reviewed: ${G.processed}   |   Best: ${best()}`;
   const tok=overToken, alive=()=>tok===overToken;
   if(cause==='david'){
-    // 1) scene goes black but thermometers / buttons / HUD stay
+    // 1) scene goes black, thermometers / buttons / HUD stay, and David's red shoots out of the top of his thermometer
     $('game').classList.add('gameover-dav');
+    $('thermoR').classList.add('max');
     attach($('dgoImg'),ASSETS.dgo,'david_gameover.png');
     $('dgoImg').classList.remove('zoom');
     $('dgo').classList.remove('hidden');
-    // 2) after a beat, the david png zooms in very quickly until it fills the screen
-    setTimeout(()=>{ if(alive()) $('dgoImg').classList.add('zoom'); },800);
+    // 2) after a beat the david png zooms in very quickly (scream.mp3) until it fills the screen
+    setTimeout(()=>{ if(alive()){ $('dgoImg').classList.add('zoom'); sfx('scream'); } },800);
     // 3) swap to the full-screen "irregularity" png
     setTimeout(()=>{
       if(!alive()) return;
@@ -573,7 +729,7 @@ function frame(now){
       G.decideT+=dt;
       const slow=G.decideT>CFG.tooLongAfter;
       $('tooLong').classList.toggle('hidden',!slow);
-      if(slow) G.comm=Math.min(100,G.comm+CFG.tooLongRate*dt);
+      if(slow){ G.comm=Math.min(100,G.comm+CFG.tooLongRate*dt); angrySfx(1.2); }
     }else{
       $('tooLong').classList.add('hidden');
       G.spawnT-=dt; if(G.spawnT<=0) spawnPlayer();
@@ -593,7 +749,7 @@ function frame(now){
 }
 requestAnimationFrame(frame);
 
-window.BS={CFG,get G(){return G},get D(){return D},decide,startGame,openPaper,closePaper,enterAway,enterWander};
+window.BS={CFG,get G(){return G},get D(){return D},decide,startGame,openPaper,closePaper,enterAway,enterWander,sfx,unlockAudio};
 </script>
 </body>
 </html>
