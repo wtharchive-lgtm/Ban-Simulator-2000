@@ -1,4 +1,4 @@
-ASSETS FOLDER  (flat: every file sits directly inside "Assets", no sub-folders)
+1ASSETS FOLDER  (flat: every file sits directly inside "Assets", no sub-folders)
 Names are exact and case-sensitive. Use .png (transparent background recommended).
 Anything missing is shown as a magenta placeholder labelled with its file name.
 
