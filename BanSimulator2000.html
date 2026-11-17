@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Ban Simulator 2000</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-user-select:none}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:Verdana,"Trebuchet MS",sans-serif;touch-action:none;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+body{position:fixed;inset:0}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:50% 50%;overflow:hidden;background:#000}
+.screen{position:absolute;inset:0}
+.hidden{display:none!important}
+
+/* ---------- placeholder sprites ---------- */
+.spr img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+.ph{background:repeating-linear-gradient(45deg,rgba(255,0,255,.35) 0 10px,rgba(60,0,60,.35) 10px 20px);border:2px dashed #fff;border-radius:8px}
+.phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;color:#fff;font:bold 13px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;word-break:break-all;pointer-events:none}
+.nolabels .phl{display:none}
+.has-asset{background:none!important;border:none!important;box-shadow:none!important}
+.has-asset .lbl{display:none}
+
+/* ---------- 2000s glossy buttons / text ---------- */
+.gbtn{font:900 40px Impact,"Arial Black",sans-serif;letter-spacing:1px;color:#0a1a08;text-shadow:0 2px 0 rgba(255,255,255,.35);
+  background:linear-gradient(#a6f27a 0%,#4cc020 48%,#2f9a10 52%,#4ebf2a 100%);border:5px solid #c41414;border-radius:30px;
+  padding:6px 38px;cursor:pointer;box-shadow:0 6px 0 #6b0808,0 8px 14px rgba(0,0,0,.5),inset 0 3px 0 rgba(255,255,255,.55);transition:transform .08s}
+.gbtn:hover{filter:brightness(1.12);transform:scale(1.05) rotate(-1deg)}
+.gbtn:active{transform:scale(.97) translateY(3px)}
+.gbtn.big{font-size:64px;padding:8px 70px}
+.gbtn.small{font-size:30px;padding:4px 28px}
+
+/* ---------- splash ---------- */
+#splash{background:radial-gradient(circle at 40% 40%,#1f8a2a,#0b4a12 80%);display:flex;align-items:center;justify-content:center;cursor:pointer}
+#splashLogo{width:560px;height:220px}
+#splash .sm{position:absolute;bottom:26px;width:100%;text-align:center;color:#bff5b8;font:16px Verdana;opacity:.8}
+
+/* ---------- menu ---------- */
+#menu{background:linear-gradient(#1c8a25 0%,#2a7d20 35%,#a01414 75%,#d11a1a 100%)}
+#menuTitle{position:absolute;left:0;top:26px;width:100%;text-align:center;font:900 90px Impact,"Arial Black",sans-serif;color:#0a0a0a;letter-spacing:3px;text-shadow:2px 2px 0 rgba(255,255,255,.18)}
+#menuTitle .t2{color:#c10e0e;margin-left:18px;font-size:104px;text-shadow:3px 3px 0 #5b0000,-1px -1px 0 #ff6b6b}
+#menu .gbtn{position:absolute}
+#bPlay{left:300px;top:240px}
+#bSettings{left:240px;top:430px}
+#bExit{left:120px;top:560px}
+#menuChar{position:absolute;right:90px;bottom:30px;width:300px;height:480px}
+#credit{position:absolute;left:0;bottom:8px;width:100%;text-align:center;color:#fff;font:12px Verdana;text-shadow:1px 1px 0 #000;opacity:.9;padding:0 20px}
+#settings{position:absolute;left:380px;top:190px;width:520px;background:linear-gradient(#a21111,#6d0808);border:6px solid #3a0404;border-radius:26px;padding:26px;color:#fff;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.6)}
+#settings h2{font:900 38px Impact,sans-serif;color:#9cff7a;text-align:center;margin-bottom:18px;text-shadow:2px 2px 0 #000}
+#settings label{display:flex;gap:12px;align-items:center;font:bold 18px Verdana;margin:10px 0 22px;cursor:pointer}
+#settings input{width:22px;height:22px}
+
+/* ---------- game scene ---------- */
+#game{background:#000}
+#bg{position:absolute;inset:0;background:
+  linear-gradient(#6aa8ee 0,#9fcdf6 300px,#c7e4fb 400px);overflow:hidden}
+#bg .clouds{position:absolute;left:0;top:0;width:200%;height:400px;animation:drift 90s linear infinite;
+  background:
+  radial-gradient(ellipse 130px 36px at 100px 90px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 170px 44px at 380px 200px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 120px 30px at 640px 70px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 200px 50px at 900px 260px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 140px 34px at 1180px 120px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 160px 40px at 1500px 220px,#fff 60%,transparent 62%),
+  radial-gradient(ellipse 110px 30px at 1800px 80px,#fff 60%,transparent 62%);
+  opacity:.9}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+#bg .bars{position:absolute;left:0;top:0;width:100%;height:410px;
+  background:repeating-linear-gradient(90deg,#0b1d6a 0 26px,transparent 26px 318px),
+  linear-gradient(#0b1d6a,#0b1d6a) 0 0/100% 18px no-repeat,
+  linear-gradient(#0b1d6a,#0b1d6a) 0 392px/100% 18px no-repeat}
+#bg .floor{position:absolute;left:0;top:410px;width:100%;height:310px;
+  background:repeating-linear-gradient(90deg,rgba(0,0,0,.08) 0 3px,transparent 3px 120px),
+  linear-gradient(#8f8f8f,#5f5f5f)}
+.sprAbs{position:absolute}
+
+#david{position:absolute;left:-240px;bottom:150px;width:150px;height:270px;transform-origin:50% 100%;
+  transform:translateX(-50%) scale(.8);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
+#david .bob{position:absolute;inset:0;animation:bob .55s infinite alternate ease-in-out}
+@keyframes bob{to{transform:translateY(-6px)}}
+
+#player{position:absolute;left:50%;bottom:128px;width:320px;height:360px;transform:translateX(-50%);z-index:3;cursor:pointer;animation:rise .45s ease-out}
+#player.out-ban{animation:dropOut .65s ease-in forwards;pointer-events:none}
+#player.out-ok{animation:hopOut .65s ease-in forwards;pointer-events:none}
+@keyframes rise{from{transform:translate(-50%,110%)}to{transform:translate(-50%,0)}}
+@keyframes dropOut{to{transform:translate(-50%,160%) rotate(25deg)}}
+@keyframes hopOut{30%{transform:translate(-50%,-30px)}to{transform:translate(-50%,-20px) scale(.2);opacity:0}}
+#player .tag{position:absolute;top:-26px;left:0;width:100%;text-align:center;color:#fff;font:bold 15px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;z-index:2}
+
+#desk{position:absolute;left:0;bottom:0;width:1280px;height:170px;z-index:5;pointer-events:none;
+  background:linear-gradient(#d9bb94 0,#c9a67c 14px,#b08c63 100%);border-top:6px solid #8f6c45;box-shadow:0 -6px 14px rgba(0,0,0,.35)}
+.dome{position:absolute;bottom:34px;width:300px;height:130px;z-index:6;cursor:pointer;transition:transform .07s}
+.dome:active{transform:translateY(5px) scale(.98)}
+.dome.red{left:110px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#ff9a8c,#e23a22 45%,#9a1608 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
+.dome.green{right:110px;border-radius:150px 150px 40px 40px/100px 100px 30px 30px;background:radial-gradient(ellipse at 50% 22%,#c9ff9c,#52c92a 45%,#1e7a0a 100%);box-shadow:0 14px 0 -2px #8a8a8a,0 20px 0 -2px #555}
+.dome:hover{filter:brightness(1.12)}
+.dome .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 30px Impact,sans-serif;color:rgba(255,255,255,.9);text-shadow:2px 2px 0 rgba(0,0,0,.4);pointer-events:none;padding-bottom:20px}
+
+.thermo{position:absolute;top:84px;width:70px;height:420px;z-index:7;pointer-events:none}
+.thermo.left{left:36px}.thermo.right{right:36px}
+.thermo .ico{position:absolute;left:3px;top:0;width:64px;height:64px;z-index:2;border-radius:12px;background:rgba(255,255,255,.06)}
+.thermo .tube{position:absolute;left:21px;top:50px;width:28px;height:360px;background:linear-gradient(90deg,#c7e5ff,#fff 40%,#d7ecff);border:4px solid #14224d;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 6px rgba(0,0,0,.35)}
+.thermo .fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(90deg,#a40000,#ff2a2a 45%,#d00000)}
+.thermo.bump{animation:bump .3s}
+@keyframes bump{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+#hint{position:absolute;left:0;bottom:178px;width:100%;text-align:center;z-index:9;color:#fff;font:bold 20px Verdana;text-shadow:2px 2px 0 #000;animation:pulse 1s infinite alternate;pointer-events:none}
+@keyframes pulse{from{opacity:.55}to{opacity:1}}
+#tooLong{position:absolute;left:0;top:34px;width:100%;text-align:center;z-index:12;font:italic 46px "Trebuchet MS",Verdana,sans-serif;color:#d6e8ff;text-shadow:3px 3px 0 #0b1d6a,0 0 12px #6aa8ee;pointer-events:none;animation:shake .25s infinite}
+@keyframes shake{25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}}
+#hud{position:absolute;left:0;top:6px;width:100%;text-align:center;z-index:8;color:#fff;font:bold 14px Verdana;text-shadow:1px 1px 0 #000;pointer-events:none}
+#dbg{position:absolute;left:6px;bottom:4px;z-index:50;color:#0f0;font:11px monospace;background:rgba(0,0,0,.6);padding:2px 4px;pointer-events:none}
+
+#paperWrap{position:absolute;inset:0;z-index:8;pointer-events:none}
+#paper{position:absolute;left:430px;top:60px;width:420px;height:520px;background:linear-gradient(#fff,#f1f1f1);border:1px solid #ccc;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;pointer-events:auto;text-align:center;padding-top:26px}
+#paper .h{font:28px "Segoe Print","Comic Sans MS",cursive;color:#111}
+#paper #reason{margin-top:34px;padding:0 24px;font:38px "Segoe Print","Comic Sans MS",cursive;color:#111;word-wrap:break-word;line-height:1.25}
+#paper .foot{position:absolute;bottom:14px;width:100%;font:12px Verdana;color:#999}
+#handL,#handR{position:absolute;bottom:0;width:120px;height:240px}
+#handL{left:380px}#handR{left:780px}
+
+#flash{position:absolute;inset:0;z-index:15;background:radial-gradient(circle,transparent 40%,rgba(255,0,0,.55));opacity:0;pointer-events:none;transition:opacity .35s}
+#flash.on{opacity:1;transition:none}
+
+#tip{position:absolute;left:260px;top:60px;width:700px;height:360px;z-index:30;filter:drop-shadow(0 10px 20px rgba(0,0,0,.6))}
+#tipBox{position:absolute;inset:0;background:linear-gradient(#1e9a1e,#157a15);border:14px solid #b01010;border-radius:34px;box-shadow:inset 0 0 0 4px #5e0707}
+#tip .ttl{position:absolute;left:150px;top:6px;font:900 30px Impact,sans-serif;color:#7dff52;text-shadow:2px 2px 0 #043604;letter-spacing:1px;z-index:3}
+#tip #helpy{position:absolute;left:-30px;top:-34px;width:100px;height:100px;z-index:4;border-radius:50%;border:5px solid #b01010;background:#223}
+#tip .txt{position:absolute;left:44px;right:44px;top:62px;bottom:70px;color:#fff;font:24px "Trebuchet MS",Verdana,sans-serif;line-height:1.3;z-index:3;white-space:pre-line}
+#tipOk{position:absolute;right:34px;bottom:22px;z-index:4;font:900 28px Impact,sans-serif;color:#fff;background:#8f0a0a;border:3px solid #3a0000;border-radius:20px;padding:2px 22px;cursor:pointer;box-shadow:0 4px 0 #3a0000}
+#tipOk:hover{background:#c01010}
+#tip.hasasset #tipBox{background:none;border:none;box-shadow:none}
+
+/* ---------- game over ---------- */
+#over{background:#000;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#d8e22a;font:40px "Trebuchet MS",Verdana,sans-serif;padding:60px}
+#over .big{font-size:46px;line-height:1.3;margin-bottom:26px;text-shadow:2px 2px 0 #333}
+#over .sc{font-size:24px;color:#fff;margin:6px 0 30px}
+#over .row{display:flex;gap:20px}
+#exitScr{background:#000;z-index:45;display:flex;align-items:center;justify-content:center;color:#fff;font:28px Verdana;cursor:pointer;text-align:center;padding:40px}
+
+/* ---------- fullscreen / rotate ---------- */
+#fsBtn{position:fixed;top:8px;right:8px;z-index:100;width:42px;height:42px;border-radius:10px;border:2px solid rgba(255,255,255,.75);background:rgba(0,0,0,.45);color:#fff;font:22px/1 Verdana;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:.8}
+#fsBtn:hover{background:rgba(0,0,0,.75);opacity:1}
+#rotate{position:fixed;inset:0;z-index:200;background:#000;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;font:22px Verdana;padding:30px}
+#rotate .ic{font-size:70px;display:block;margin-bottom:16px}
+
+/* ---------- David game over ---------- */
+.gameover-dav #bg,.gameover-dav #david,.gameover-dav #player,.gameover-dav #desk,.gameover-dav #paperWrap,.gameover-dav #hint,.gameover-dav #tooLong,.gameover-dav #tip{display:none!important}
+#dgo{position:absolute;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#dgoImg{width:300px;height:420px;transform:scale(1)}
+#dgoImg.zoom{transform:scale(7.5);transition:transform .7s cubic-bezier(.75,0,1,.55)}
+#irreg{position:absolute;inset:0;z-index:36;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#d8e22a;font:44px "Trebuchet MS",Verdana,sans-serif;padding:60px;line-height:1.35}
+#irreg img.a{z-index:0}
+#irreg .fb{position:relative;z-index:1}
+#irreg .again{position:absolute;left:0;bottom:26px;width:100%;z-index:2;color:#fff;font:bold 22px Verdana;text-shadow:2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;animation:pulse 1s infinite alternate}
+#irreg .again #irregScore{font-size:16px;opacity:.9;margin-bottom:6px}
+#paper>img.a{z-index:-1}
+</style>
+</head>
+<body>
+<div id="stage">
+
+  <!-- SPLASH -->
+  <div id="splash" class="screen">
+    <div id="splashLogo" class="spr"></div>
+    <div class="sm">click to continue</div>
+  </div>
+
+  <!-- MENU -->
+  <div id="menu" class="screen hidden">
+    <div id="menuTitle">BAN SIMULATOR<span class="t2">2000</span></div>
+    <button class="gbtn big" id="bPlay">PLAY</button>
+    <button class="gbtn" id="bSettings">SETTINGS</button>
+    <button class="gbtn small" id="bExit">EXIT</button>
+    <div id="menuChar" class="spr"></div>
+    <div id="credit"></div>
+    <div id="settings" class="hidden">
+      <h2>SETTINGS</h2>
+      <label><input type="checkbox" id="optLabels" checked> Show placeholder labels</label>
+      <div style="text-align:center"><button class="gbtn small" id="bBack">BACK</button></div>
+    </div>
+  </div>
+
+  <!-- GAME -->
+  <div id="game" class="screen hidden">
+    <div id="bg"><div class="clouds"></div><div class="bars"></div><div class="floor"></div><div id="bgImg" class="sprAbs" style="inset:0"></div></div>
+
+    <div id="david"><div class="bob spr" id="davidSpr"></div></div>
+
+    <div id="player" class="hidden"><div class="tag" id="ptag"></div><div id="pspr" class="spr" style="position:absolute;inset:0"></div></div>
+
+    <div id="desk"></div>
+    <div id="btnBan" class="dome red"><div class="lbl">BAN</div></div>
+    <div id="btnOk" class="dome green"><div class="lbl">APPEAL</div></div>
+
+    <div id="thermoL" class="thermo left"><div class="ico spr" id="icoL"></div><div class="tube"><div class="fill" id="fillL"></div></div></div>
+    <div id="thermoR" class="thermo right"><div class="ico spr" id="icoR"></div><div class="tube"><div class="fill" id="fillR"></div></div></div>
+
+    <div id="hud"></div>
+    <div id="hint" class="hidden">Click the player to read their ban reason</div>
+    <div id="tooLong" class="hidden">You're taking too long!</div>
+
+    <div id="paperWrap" class="hidden">
+      <div id="paper"><div class="h">Offensive Item:</div><div id="reason"></div><div class="foot">(click to put down)</div></div>
+      <div id="handL" class="spr"></div><div id="handR" class="spr"></div>
+    </div>
+
+    <div id="flash"></div>
+
+    <div id="tip" class="hidden">
+      <div id="tipBox"></div>
+      <div id="helpy" class="spr"></div>
+      <div class="ttl">Helpy's Tips</div>
+      <div class="txt" id="tipTxt"></div>
+      <button id="tipOk">OK!</button>
+    </div>
+    <div id="dbg" class="hidden"></div>
+
+    <!-- David game-over: zooming png, then the irregularity png -->
+    <div id="dgo" class="hidden"><div id="dgoImg" class="spr"></div></div>
+    <div id="irreg" class="hidden">
+      <div class="fb">An irregularity has been detected.<br>David is furious. You have been fired.</div>
+      <div class="again"><div id="irregScore"></div>Press any key or click anywhere to play again</div>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="over" class="screen hidden">
+    <div class="big" id="overMsg"></div>
+    <div class="sc" id="overScore"></div>
+    <div class="row"><button class="gbtn small" id="bRetry">RETRY</button><button class="gbtn small" id="bMenu">MENU</button></div>
+  </div>
+
+  <div id="exitScr" class="screen hidden">Thanks for playing!<br><br>You can close this tab now.<br><small>(click to go back)</small></div>
+</div>
+<button id="fsBtn" title="Fullscreen (F)" aria-label="Toggle fullscreen">&#x26F6;</button>
+<div id="rotate"><div><span class="ic">&#x21BB;</span>Please rotate your device to landscape<br><small>(or make the window wider)</small></div></div>
+
+<script>
+/* =====================================================================
+   BAN SIMULATOR 2000  -  prototype
+   All tunables live in CFG. All icons live in Assets/ (see ASSETS).
+   ===================================================================== */
+const CFG = {
+  credit: 'Fan-made recreation of the animation "Ban Simulator 2000" — original animation by [ADD CREATOR NAME HERE]. Not affiliated with Roblox.',
+
+  // thermometers (0-100). You lose when either one reaches 100.
+  banCommunity: 10,        // left meter: +this per ban
+  appealCalm: 5,           // left meter: -this when you appeal while David is NOT looking
+  appealWatching: 30,      // right meter: +this when you appeal in front of David
+  appealRage: 45,          // right meter: +this (fast) when you appeal during his ambush
+  davidCooldown: 0.5,      // right meter drains this per second
+  meterRate: 45,           // meter fill speed (per second)
+  rageRate: 140,           // meter fill speed during rage
+  furiousAt: 70,           // "David is furious" tip
+  peekAt: 55,              // right meter level where David starts peeking behind the paper
+
+  // slow decisions
+  tooLongAfter: 8,         // seconds before the community gets angry
+  tooLongRate: 3,          // left meter +per second while taking too long
+
+  // David behaviour
+  wanderMin: 6,  wanderMax: 10,   // seconds visible and wandering
+  awayMin: 5,    awayMax: 8,      // seconds off-bounds (safe window)
+  ambushChance: 0.5,              // chance per hover on green while he is away
+  ambushDelay: 0.45,              // seconds before he pops back in
+  ambushStay: 3.2,                // seconds he stays close on the right
+  postAmbushAway: 4.5,            // safe window after the ambush
+
+  nextPlayerDelay: 1.1
+};
+
+const ASSETS = {
+  splashLogo:'roblox_logo.png', menuChar:'menu_character.png',
+  bg:'bg_room.png', desk:'desk.png', btnBan:'button_ban.png', btnOk:'button_unban.png',
+  david:'david_body.png',
+  davidIcons:['david_icon_calm.png','david_icon_mad.png','david_icon_furious.png'],
+  commIcons:['community_icon_happy.png','community_icon_meh.png','community_icon_angry.png'],
+  helpy:'helpy.png', tipPanel:'tips_panel.png', paper:'paper.png',
+  handL:'hands_paper_left.png', handR:'hands_paper_right.png',
+  dgo:'david_gameover.png',               // zooms in from the middle when David's meter fills
+  irreg:'game_over_irregularity.png'      // full-screen "An irregularity has been detected" screen
+};
+const isTouch = matchMedia('(hover:none)').matches;
+const CLICK = isTouch ? 'Tap' : 'Click';
+const DIR = 'Assets/';
+
+const PLAYERS = [
+  {f:'player_1.png',n:'NoobMaster_2003'},{f:'player_2.png',n:'xX_CoolGuy_Xx'},
+  {f:'player_3.png',n:'BaconFan123'},{f:'player_4.png',n:'SkyBuilder'},
+  {f:'player_5.png',n:'Epic_Gamer_7'},{f:'player_6.png',n:'tacoLover99'}
+];
+const REASONS = ["hello","i love my family","yes","no","hi mom","good morning","i like pizza","pls dont ban me","ok","free tacos","nothing","i said please","water is wet","thank you","lol","sandwich","i love trains","have a nice day","my dog is cute","the number 7","tuesday","i did not do it","wholesome stuff only","123","bread","uhh","i just waved","happy birthday!","my cat is named bacon","i like your hat","...","good game","clouds","i like turtles","what","banana","blue is my favorite color","i am a good person","hello?","please and thank you"];
+
+const TIPS = {
+  intro:"Robloxians who are banned will come to you.\nYour job is to decide whether to remove the ban (GREEN) or terminate them (RED).\n\n"+CLICK+" a player to read their ban reason."+(isTouch?"\nTip: touch and HOLD the green button to see if David is waiting for you...":""),
+  firstBan:"Roblox Players did not like that!\nBanning people makes the Playerbase angry.\nDon't ban everyone!",
+  firstSaw:"David saw that!\nDavid likes his bans. Reversing one in front of him makes him ANGRY.\nWait until he looks away!",
+  furious:"David is furious now!\nHe'll start peeking at the papers you read.\nOne more slip and it's game over!"
+};
+
+/* ---------------- sprites with placeholder fallback ---------------- */
+function attach(parent,file,label,quiet){
+  if(parent.dataset.file===file) return;
+  parent.dataset.file=file;
+  parent.querySelectorAll(':scope>img.a,:scope>.phl').forEach(e=>e.remove());
+  parent.classList.remove('ph','has-asset');
+  if(getComputedStyle(parent).position==='static') parent.style.position='relative';
+  let lab=null;
+  if(!quiet){ parent.classList.add('ph'); lab=document.createElement('span'); lab.className='phl'; lab.textContent=label||file; parent.appendChild(lab); }
+  const img=new Image(); img.className='a'; img.draggable=false; img.alt='';
+  img.onload=()=>{ parent.classList.remove('ph'); parent.classList.add('has-asset'); if(lab) lab.remove(); };
+  img.onerror=()=>{ img.remove(); };
+  img.src=DIR+file;
+  parent.appendChild(img);
+}
+const $=id=>document.getElementById(id);
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* ---------------- screens ---------------- */
+function show(id){ ['splash','menu','game','over','exitScr'].forEach(s=>$(s).classList.toggle('hidden',s!==id)); }
+function fit(){
+  const w=innerWidth,h=innerHeight, s=Math.min(w/1280,h/720);
+  $('stage').style.transform=`translate(-50%,-50%) scale(${s})`;
+  $('rotate').style.display = h>w ? 'flex' : 'none';   // portrait: ask to rotate (game is paused)
+}
+addEventListener('resize',fit); addEventListener('orientationchange',fit); fit();
+addEventListener('contextmenu',e=>e.preventDefault());
+
+/* ---------------- fullscreen ---------------- */
+const fsEl=document.documentElement;
+const reqFs=fsEl.requestFullscreen||fsEl.webkitRequestFullscreen;
+const exitFs=document.exitFullscreen||document.webkitExitFullscreen;
+const isFs=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+function toggleFs(){
+  try{
+    if(isFs()) exitFs.call(document);
+    else Promise.resolve(reqFs.call(fsEl)).then(()=>{ try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(e){} }).catch(()=>{});
+  }catch(e){}
+}
+function updFs(){ $('fsBtn').innerHTML = isFs() ? '&#x2715;' : '&#x26F6;'; fit(); }
+if(!reqFs) $('fsBtn').style.display='none';        // e.g. iPhone Safari has no element fullscreen
+$('fsBtn').onclick=toggleFs;
+document.addEventListener('fullscreenchange',updFs); document.addEventListener('webkitfullscreenchange',updFs);
+addEventListener('keydown',e=>{ if(e.code==='KeyF'&&!e.ctrlKey&&!e.metaKey&&!e.altKey) toggleFs(); });
+
+attach($('splashLogo'),ASSETS.splashLogo,'roblox_logo.png');
+attach($('menuChar'),ASSETS.menuChar,'menu_character.png');
+$('credit').textContent=CFG.credit;
+$('splash').onclick=()=>{ clearTimeout(splashT); show('menu'); };
+const splashT=setTimeout(()=>{ if(!$('splash').classList.contains('hidden')) show('menu'); },2600);
+$('bPlay').onclick=startGame;
+$('bSettings').onclick=()=>$('settings').classList.remove('hidden');
+$('bBack').onclick=()=>$('settings').classList.add('hidden');
+$('optLabels').onchange=e=>document.body.classList.toggle('nolabels',!e.target.checked);
+$('bExit').onclick=()=>show('exitScr');
+$('exitScr').onclick=()=>show('menu');
+$('bRetry').onclick=startGame;
+$('bMenu').onclick=()=>show('menu');
+
+/* ---------------- game state ---------------- */
+let G={}, D={}, overToken=0;
+const SEEN={};                       // tips are shown once per page load
+const PAPER={l:430,r:850};
+function best(){ try{return +localStorage.getItem('bs2000best')||0}catch(e){return 0} }
+function saveBest(v){ try{localStorage.setItem('bs2000best',v)}catch(e){} }
+
+function startGame(){
+  G={running:true,paused:false,over:false,comm:0,commShown:0,dav:0,davShown:0,rage:false,
+     player:null,paperOpen:false,decideT:0,processed:0,spawnT:0.6,tipsSeen:SEEN,tipOpen:false,readOnce:false,canRestart:false};
+  D={mode:'away',t:rnd(2,4),tick:0};
+  overToken++; tipQueue.length=0;
+  show('game');
+  $('over').classList.add('hidden');
+  $('game').classList.remove('gameover-dav');
+  $('dgo').classList.add('hidden'); $('irreg').classList.add('hidden'); $('dgoImg').classList.remove('zoom');
+  $('hint').textContent=CLICK+' the player to read their ban reason';
+  $('paper').querySelector('.foot').textContent='('+CLICK.toLowerCase()+' to put down)';
+  attach($('bgImg'),ASSETS.bg,'bg_room.png',true);
+  attach($('desk'),ASSETS.desk,'desk.png',true);
+  attach($('btnBan'),ASSETS.btnBan,'button_ban.png',true);
+  attach($('btnOk'),ASSETS.btnOk,'button_unban.png',true);
+  attach($('davidSpr'),ASSETS.david,'david_body.png');
+  attach($('helpy'),ASSETS.helpy,'helpy.png');
+  attach($('handL'),ASSETS.handL,'hands_paper_left.png');
+  attach($('handR'),ASSETS.handR,'hands_paper_right.png');
+  attach($('tipBox'),ASSETS.tipPanel,'tips_panel.png',true);
+  $('tip').classList.toggle('hasasset',$('tipBox').classList.contains('has-asset'));
+  $('paper').dataset.file=''; attach($('paper'),ASSETS.paper,'paper.png',true);
+  $('paperWrap').classList.add('hidden'); $('player').classList.add('hidden');
+  $('hint').classList.add('hidden'); $('tooLong').classList.add('hidden');
+  $('dbg').classList.toggle('hidden',!location.search.includes('debug'));
+  davidSet(-240,.8,0,0.01);
+  updateHud(); renderMeters(true);
+  showTip('intro');
+}
+
+/* ---------------- tips ---------------- */
+const tipQueue=[];
+function showTip(key){
+  if(G.tipsSeen[key]) return; G.tipsSeen[key]=true;
+  if(G.tipOpen){ tipQueue.push(key); G.tipsSeen[key]=true; return; }
+  G.tipOpen=true; G.paused=true;
+  $('tipTxt').textContent=TIPS[key]; $('tip').classList.remove('hidden');
+}
+$('tipOk').onclick=()=>{
+  $('tip').classList.add('hidden'); G.tipOpen=false;
+  if(tipQueue.length){ const k=tipQueue.shift(); G.tipsSeen[k]=false; showTip(k); }
+  else G.paused=false;
+};
+
+/* ---------------- David ---------------- */
+function davidSet(x,scale,rot,dur){
+  const el=$('david'); el.style.setProperty('--d',dur+'s');
+  el.style.left=x+'px'; el.style.transform=`translateX(-50%) scale(${scale}) rotate(${rot}deg)`;
+}
+const watching=()=>['wander','ambush','peek'].includes(D.mode);
+function enterWander(){ D.mode='wander'; D.t=rnd(CFG.wanderMin,CFG.wanderMax); D.tick=0; }
+function enterAway(t){ D.mode='away'; D.t=t||rnd(CFG.awayMin,CFG.awayMax); davidSet(-240,.8,0,1.0); }
+function enterAmbush(){
+  D.mode='ambush'; D.t=CFG.ambushStay;
+  davidSet(1450,1.6,0,0.01); $('david').offsetWidth; davidSet(1000,1.6,0,0.35);
+}
+function enterPeek(){
+  D.mode='peek'; const left=Math.random()<.5;
+  davidSet(left?PAPER.l+25:PAPER.r-25,1.3,left?-45:45,0.5);
+}
+function updateDavid(dt){
+  const want=G.paperOpen && G.dav>=CFG.peekAt;
+  if(want && D.mode!=='peek') enterPeek();
+  else if(!want && D.mode==='peek') enterWander();
+  D.t-=dt;
+  switch(D.mode){
+    case 'wander':
+      D.tick-=dt;
+      if(D.tick<=0){ D.tick=rnd(2,3.2); davidSet(rnd(300,1000),rnd(.75,.95),0,D.tick*.95); }
+      if(D.t<=0) enterAway();
+      break;
+    case 'away': if(D.t<=0) enterWander(); break;
+    case 'pending': if(D.t<=0) enterAmbush(); break;
+    case 'ambush': if(D.t<=0 && !G.rage) enterAway(CFG.postAmbushAway); break;
+  }
+}
+// Mouse: hovering the green button rolls the ambush chance.
+// Touch has no hover, so pressing (touch-and-hold) the green button counts as hovering,
+// and David appears instantly so he is already there when you release.
+function tryAmbush(instant){
+  if(!G.running||G.paused||G.over) return;
+  if(D.mode==='away' && Math.random()<CFG.ambushChance){
+    if(instant) enterAmbush(); else { D.mode='pending'; D.t=CFG.ambushDelay; }
+  }
+}
+$('btnOk').addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') tryAmbush(false); });
+$('btnOk').addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') tryAmbush(true); });
+
+/* ---------------- players & paper ---------------- */
+function spawnPlayer(){
+  const p=pick(PLAYERS), el=$('player');
+  el.className=''; void el.offsetWidth;
+  el.classList.remove('hidden');
+  $('ptag').textContent=p.n;
+  $('pspr').dataset.file=''; attach($('pspr'),p.f,p.f.replace('.png',''));
+  G.player={reason:pick(REASONS),name:p.n}; G.decideT=0;
+  $('reason').textContent=G.player.reason;
+  if(!G.readOnce) $('hint').classList.remove('hidden');
+}
+function openPaper(){ if(!G.player||G.paperOpen) return; G.paperOpen=true; G.readOnce=true; $('paperWrap').classList.remove('hidden'); $('hint').classList.add('hidden'); }
+function closePaper(){ G.paperOpen=false; $('paperWrap').classList.add('hidden'); }
+$('player').onclick=()=>{ if(G.paused||G.over) return; G.paperOpen?closePaper():openPaper(); };
+$('paper').onclick=()=>{ if(G.paused||G.over) return; closePaper(); };
+addEventListener('keydown',e=>{ if(e.code==='Space'&&G.running&&!G.paused&&!G.over){ e.preventDefault(); G.paperOpen?closePaper():openPaper(); } });
+
+function leave(kind){
+  const el=$('player'); el.classList.add(kind==='ban'?'out-ban':'out-ok');
+}
+function bump(id){ const e=$(id); e.classList.remove('bump'); void e.offsetWidth; e.classList.add('bump'); }
+function flash(){ const f=$('flash'); f.classList.add('on'); setTimeout(()=>f.classList.remove('on'),60); }
+
+function decide(kind){
+  if(!G.running||G.paused||G.over||!G.player) return;
+  if(G.comm>=100||G.dav>=100) return;      // a meter is already full: it's over, no last-second saves
+  G.player=null; G.processed++; closePaper(); $('hint').classList.add('hidden');
+  if(kind==='ban'){
+    G.comm=Math.min(100,G.comm+CFG.banCommunity); bump('thermoL'); leave('ban'); showTip('firstBan');
+  }else{
+    if(watching()){
+      if(D.mode==='ambush'){ G.dav=Math.min(100,G.dav+CFG.appealRage); G.rage=true; }
+      else G.dav=Math.min(100,G.dav+CFG.appealWatching);
+      bump('thermoR'); flash(); showTip('firstSaw');
+    }else{
+      G.comm=Math.max(0,G.comm-CFG.appealCalm);
+    }
+    leave('ok');
+  }
+  G.spawnT=CFG.nextPlayerDelay; updateHud();
+}
+$('btnBan').onclick=()=>decide('ban');
+$('btnOk').onclick=()=>decide('ok');
+
+/* ---------------- meters ---------------- */
+function approach(cur,target,up,down,dt){ return cur<target?Math.min(target,cur+up*dt):Math.max(target,cur-down*dt); }
+function renderMeters(force){
+  $('fillL').style.height=G.commShown+'%'; $('fillR').style.height=G.davShown+'%';
+  attach($('icoL'),ASSETS.commIcons[G.commShown<33?0:G.commShown<66?1:2],'community_icon');
+  attach($('icoR'),ASSETS.davidIcons[G.davShown<35?0:G.davShown<70?1:2],'david_icon');
+}
+function updateHud(){ $('hud').textContent=`Accounts reviewed: ${G.processed}   |   Best: ${Math.max(best(),G.processed)}`; }
+
+function lose(cause){
+  if(G.over) return; G.over=true; G.running=false;
+  closePaper(); $('tooLong').classList.add('hidden'); $('hint').classList.add('hidden');
+  if(G.processed>best()) saveBest(G.processed);
+  const score=`Accounts reviewed: ${G.processed}   |   Best: ${best()}`;
+  const tok=overToken, alive=()=>tok===overToken;
+  if(cause==='david'){
+    // 1) scene goes black but thermometers / buttons / HUD stay
+    $('game').classList.add('gameover-dav');
+    attach($('dgoImg'),ASSETS.dgo,'david_gameover.png');
+    $('dgoImg').classList.remove('zoom');
+    $('dgo').classList.remove('hidden');
+    // 2) after a beat, the david png zooms in very quickly until it fills the screen
+    setTimeout(()=>{ if(alive()) $('dgoImg').classList.add('zoom'); },800);
+    // 3) swap to the full-screen "irregularity" png
+    setTimeout(()=>{
+      if(!alive()) return;
+      attach($('irreg'),ASSETS.irreg,'game_over_irregularity.png',true);
+      $('irregScore').textContent=score;
+      $('irreg').classList.remove('hidden'); $('dgo').classList.add('hidden');
+    },800+720);
+    // 4) any key / click restarts (small delay so you don't skip it by accident)
+    setTimeout(()=>{ if(alive()) G.canRestart=true; },800+720+600);
+  }else{
+    $('overMsg').innerHTML='The Roblox community has had enough.<br>You have been replaced.';
+    $('overScore').textContent=score;
+    setTimeout(()=>{ if(alive()) $('over').classList.remove('hidden'); },900);
+  }
+}
+function tryRestart(e){
+  if(!G.canRestart) return;
+  if(e.type==='keydown' && (e.code==='KeyF'||e.ctrlKey||e.metaKey||e.altKey)) return;
+  if(e.target && e.target.closest && e.target.closest('#fsBtn')) return;
+  G.canRestart=false; startGame();
+}
+addEventListener('keydown',tryRestart); addEventListener('pointerdown',tryRestart);
+
+/* ---------------- main loop ---------------- */
+let last=performance.now();
+function frame(now){
+  const dt=Math.min(.1,(now-last)/1000); last=now;
+  if(G.running && !G.paused && !G.over && innerWidth>=innerHeight){
+    updateDavid(dt);
+    // slow decisions
+    if(G.player){
+      G.decideT+=dt;
+      const slow=G.decideT>CFG.tooLongAfter;
+      $('tooLong').classList.toggle('hidden',!slow);
+      if(slow) G.comm=Math.min(100,G.comm+CFG.tooLongRate*dt);
+    }else{
+      $('tooLong').classList.add('hidden');
+      G.spawnT-=dt; if(G.spawnT<=0) spawnPlayer();
+    }
+    if(!G.rage && G.dav<100) G.dav=Math.max(0,G.dav-CFG.davidCooldown*dt);   // a full meter never drains
+    G.commShown=approach(G.commShown,G.comm,CFG.meterRate,60,dt);
+    G.davShown=approach(G.davShown,G.dav,G.rage?CFG.rageRate:CFG.meterRate,60,dt);
+    if(G.rage && G.davShown>=G.dav-.01){ G.rage=false; if(D.mode==='ambush') enterWander(); }
+    renderMeters();
+    if(G.dav>=CFG.furiousAt && G.dav<100) showTip('furious');
+    if(G.davShown>=99.5) lose('david');
+    else if(G.commShown>=99.5) lose('community');
+    if(!$('dbg').classList.contains('hidden'))
+      $('dbg').textContent=`david:${D.mode} t=${D.t.toFixed(1)} dav=${G.dav.toFixed(0)} comm=${G.comm.toFixed(0)} paper=${G.paperOpen}`;
+  }
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+window.BS={CFG,get G(){return G},get D(){return D},decide,startGame,openPaper,closePaper,enterAway,enterWander};
+</script>
+</body>
+</html>
