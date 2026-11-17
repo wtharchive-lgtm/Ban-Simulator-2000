@@ -15,12 +15,19 @@ body{position:fixed;inset:0}
 .hidden{display:none!important}
 
 /* ---------- placeholder sprites ---------- */
-.spr img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
+/* every loaded asset image fills its box, keeping its own proportions (never stretched) */
+img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;-webkit-user-drag:none}
+/* things that stand on the floor / hang from the meter stay anchored to the bottom of their box */
+#davidSpr img.a,#pspr img.a,.thermo .ico img.a{object-position:50% 100%}
+/* buttons: the box is the click area; the picture can be bigger (e.g. a 1000x1000 png) and is centred on it */
+.dome img.a{inset:auto;left:50%;top:50%;width:var(--bw,380px);height:var(--bh,380px);transform:translate(-50%,calc(-50% + var(--bdy,0px)))}
 .ph{background:repeating-linear-gradient(45deg,rgba(255,0,255,.35) 0 10px,rgba(60,0,60,.35) 10px 20px);border:2px dashed #fff;border-radius:8px}
 .phl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;color:#fff;font:bold 13px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000;word-break:break-all;pointer-events:none}
 .nolabels .phl{display:none}
 .has-asset{background:none!important;border:none!important;box-shadow:none!important}
-.has-asset .lbl{display:none}
+.has-asset>.lbl{display:none!important}
+#splash .bar{position:absolute;left:50%;bottom:64px;width:360px;height:14px;transform:translateX(-50%);border:2px solid #bff5b8;border-radius:8px;overflow:hidden}
+#splash .bar i{display:block;height:100%;width:0;background:#bff5b8}
 
 /* ---------- 2000s glossy buttons / text ---------- */
 .gbtn{font:900 40px Impact,"Arial Black",sans-serif;letter-spacing:1px;color:#0a1a08;text-shadow:0 2px 0 rgba(255,255,255,.35);
@@ -75,8 +82,8 @@ body{position:fixed;inset:0}
   linear-gradient(#8f8f8f,#5f5f5f)}
 .sprAbs{position:absolute}
 
-#david{position:absolute;left:-240px;bottom:150px;width:150px;height:270px;transform-origin:50% 100%;
-  transform:translateX(-50%) scale(.8);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
+#david{position:absolute;left:-260px;bottom:150px;width:160px;height:340px;transform-origin:50% 100%;
+  transform:translateX(-50%) scale(.9);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
 #david .bob{position:absolute;inset:0;animation:bob .55s infinite alternate ease-in-out}
 @keyframes bob{to{transform:translateY(-6px)}}
 
@@ -97,10 +104,12 @@ body{position:fixed;inset:0}
 .dome:hover{filter:brightness(1.12)}
 .dome .lbl{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:900 30px Impact,sans-serif;color:rgba(255,255,255,.9);text-shadow:2px 2px 0 rgba(0,0,0,.4);pointer-events:none;padding-bottom:20px}
 
-.thermo{position:absolute;top:84px;width:70px;height:420px;z-index:7;pointer-events:none}
-.thermo.left{left:36px}.thermo.right{right:36px}
-.thermo .ico{position:absolute;left:3px;top:0;width:64px;height:64px;z-index:2;border-radius:12px;background:rgba(255,255,255,.06)}
-.thermo .tube{position:absolute;left:21px;top:50px;width:28px;height:360px;background:linear-gradient(90deg,#c7e5ff,#fff 40%,#d7ecff);border:4px solid #14224d;border-radius:14px;overflow:hidden;box-shadow:inset 0 0 6px rgba(0,0,0,.35)}
+/* Proportions measured from the original animation: icon ~90-110px wide and up to ~150px tall
+   (David's head+neck is tall), sitting right on top of a ~46px wide, ~300px tall tube. */
+.thermo{position:absolute;top:56px;width:120px;height:470px;z-index:7;pointer-events:none}
+.thermo.left{left:44px}.thermo.right{right:44px}
+.thermo .ico{position:absolute;left:0;top:0;width:120px;height:170px;z-index:2}
+.thermo .tube{position:absolute;left:37px;top:160px;width:46px;height:300px;background:linear-gradient(90deg,#c7e5ff,#fff 40%,#d7ecff);border:5px solid #0b0b0b;border-radius:24px;overflow:hidden;box-shadow:inset 0 0 6px rgba(0,0,0,.35)}
 .thermo .fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(90deg,#a40000,#ff2a2a 45%,#d00000)}
 .thermo.bump{animation:bump .3s}
 @keyframes bump{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
@@ -113,12 +122,19 @@ body{position:fixed;inset:0}
 #dbg{position:absolute;left:6px;bottom:4px;z-index:50;color:#0f0;font:11px monospace;background:rgba(0,0,0,.6);padding:2px 4px;pointer-events:none}
 
 #paperWrap{position:absolute;inset:0;z-index:8;pointer-events:none}
-#paper{position:absolute;left:430px;top:60px;width:420px;height:520px;background:linear-gradient(#fff,#f1f1f1);border:1px solid #ccc;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;pointer-events:auto;text-align:center;padding-top:26px}
-#paper .h{font:28px "Segoe Print","Comic Sans MS",cursive;color:#111}
-#paper #reason{margin-top:34px;padding:0 24px;font:38px "Segoe Print","Comic Sans MS",cursive;color:#111;word-wrap:break-word;line-height:1.25}
-#paper .foot{position:absolute;bottom:14px;width:100%;font:12px Verdana;color:#999}
-#handL,#handR{position:absolute;bottom:0;width:120px;height:240px}
-#handL{left:380px}#handR{left:780px}
+/* paper_scene.png = ONE full-stage (1280x720) overlay with the paper AND both hands.
+   #paper is just the invisible click area + text box placed over the paper (set in CFG.paper). */
+#paperScene{position:absolute;inset:0;pointer-events:none}
+#paper{position:absolute;left:415px;top:57px;width:450px;height:626px;background:linear-gradient(#fff,#f1f1f1);border:1px solid #ccc;box-shadow:0 8px 24px rgba(0,0,0,.45);cursor:pointer;pointer-events:auto;text-align:center;padding-top:44px}
+#paper.art{background:none;border:none;box-shadow:none}
+#paper .h{font:34px "Segoe Print","Comic Sans MS",cursive;color:#111}
+#paper #reason{margin-top:46px;padding:0 28px;font:42px "Segoe Print","Comic Sans MS",cursive;color:#111;word-wrap:break-word;line-height:1.25}
+#paper .foot,#paper .miss{position:absolute;width:100%;left:0;text-align:center}
+#paper .foot{bottom:14px;font:12px Verdana;color:#999}
+#paper .miss{bottom:60px;color:#fff;font:bold 13px Verdana;text-shadow:1px 1px 0 #000,-1px -1px 0 #000}
+#paper .miss span{display:inline-block;padding:8px 12px;border:2px dashed #fff;border-radius:8px;background:repeating-linear-gradient(45deg,rgba(255,0,255,.55) 0 10px,rgba(60,0,60,.55) 10px 20px)}
+#paper.art .foot,#paper.art .miss,.nolabels #paper .miss{display:none}
+#paper.noheading .h{display:none}
 
 #flash{position:absolute;inset:0;z-index:15;background:radial-gradient(circle,transparent 40%,rgba(255,0,0,.55));opacity:0;pointer-events:none;transition:opacity .35s}
 #flash.on{opacity:1;transition:none}
@@ -155,7 +171,6 @@ body{position:fixed;inset:0}
 #irreg .fb{position:relative;z-index:1}
 #irreg .again{position:absolute;left:0;bottom:26px;width:100%;z-index:2;color:#fff;font:bold 22px Verdana;text-shadow:2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;animation:pulse 1s infinite alternate}
 #irreg .again #irregScore{font-size:16px;opacity:.9;margin-bottom:6px}
-#paper>img.a{z-index:-1}
 </style>
 </head>
 <body>
@@ -164,7 +179,8 @@ body{position:fixed;inset:0}
   <!-- SPLASH -->
   <div id="splash" class="screen">
     <div id="splashLogo" class="spr"></div>
-    <div class="sm">click to continue</div>
+    <div class="bar"><i id="loadFill"></i></div>
+    <div class="sm" id="loadTxt">Loading… 0%</div>
   </div>
 
   <!-- MENU -->
@@ -202,8 +218,9 @@ body{position:fixed;inset:0}
     <div id="tooLong" class="hidden">You're taking too long!</div>
 
     <div id="paperWrap" class="hidden">
-      <div id="paper"><div class="h">Offensive Item:</div><div id="reason"></div><div class="foot">(click to put down)</div></div>
-      <div id="handL" class="spr"></div><div id="handR" class="spr"></div>
+      <div id="paperScene"></div>
+      <div id="paper"><div class="h">Offensive Item:</div><div id="reason"></div><div class="foot">(click to put down)</div>
+        <div class="miss"><span>paper_scene.png<br>(paper + both hands)</span></div></div>
     </div>
 
     <div id="flash"></div>
