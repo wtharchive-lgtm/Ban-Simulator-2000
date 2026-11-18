@@ -41,6 +41,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 #splash{background:radial-gradient(circle at 40% 40%,#1f8a2a,#0b4a12 80%);display:flex;align-items:center;justify-content:center;cursor:pointer}
 #splashLogo{width:560px;height:220px}
 #splash .sm{position:absolute;bottom:26px;width:100%;text-align:center;color:#bff5b8;font:16px Verdana;opacity:.9}
+#splash .sm2{position:absolute;bottom:100px;width:100%;text-align:center;color:#fff;font:bold 18px Verdana;animation:pulse 1s infinite alternate}
 #splash .bar{position:absolute;left:50%;bottom:64px;width:360px;height:14px;transform:translateX(-50%);border:2px solid #bff5b8;border-radius:8px;overflow:hidden}
 #splash .bar i{display:block;height:100%;width:0;background:#bff5b8}
 
@@ -88,9 +89,8 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 
 /* David: box is his "far away" size (~340px tall); closer = scaled up + moved down (see davidSet) */
 #david{position:absolute;left:-260px;bottom:200px;width:160px;height:340px;transform-origin:50% 100%;
-  transform:translateX(-50%) scale(1);transition:left var(--d,1s) ease-in-out,transform var(--d,1s) ease-in-out;z-index:2;pointer-events:none}
-#david .bob{position:absolute;inset:0;animation:bob .55s infinite alternate ease-in-out}
-@keyframes bob{to{transform:translateY(-6px)}}
+  transform:translateX(-50%) scale(1);transition:left var(--d,0s) linear,transform var(--dt,0s) linear;z-index:2;pointer-events:none}   /* linear, like the cut-out in the original */
+#david .bob{position:absolute;inset:0}   /* no bobbing: the original David is a stiff cut-out */
 
 /* player: big upper body behind the desk like the original (head ~150px wide); the legs hide behind the desk */
 #player{position:absolute;left:50%;top:270px;width:420px;height:760px;transform:translateX(-50%);z-index:3;cursor:pointer;animation:rise .45s ease-out}
@@ -114,7 +114,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
    sitting right on a ~52px wide, ~297px tall tube. Centres at x=166 and x=1113. */
 .thermo{position:absolute;top:56px;width:120px;height:470px;z-index:7;pointer-events:none}
 .thermo.left{left:106px}.thermo.right{left:1053px}
-.thermo .ico{position:absolute;left:15px;top:32px;width:90px;height:134px;z-index:2}
+.thermo .ico{position:absolute;left:15px;top:44px;width:90px;height:134px;z-index:2}
 .thermo .tube{position:absolute;left:34px;top:167px;width:52px;height:297px;background:linear-gradient(#cfe8ff,#fff 22%,#eaf5ff);border:5px solid #000;border-radius:26px;overflow:hidden}
 .thermo .fill{position:absolute;left:0;bottom:0;width:100%;height:0%;background:linear-gradient(90deg,#d60000,#ff1a1a 45%,#e00000)}
 /* when a meter is completely full the red shoots out of the top of the thermometer and off the screen */
@@ -177,8 +177,10 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
 #irreg{position:absolute;inset:0;z-index:36;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#d8e22a;font:44px "Trebuchet MS",Verdana,sans-serif;padding:60px;line-height:1.35}
 #irreg img.a{z-index:0}
 #irreg .fb{position:relative;z-index:1}
+#irreg.has-asset .fb{display:none}   /* your png already says it */
 #irreg .again{position:absolute;left:0;bottom:26px;width:100%;z-index:2;color:#fff;font:bold 22px Verdana;text-shadow:2px 2px 0 #000,-2px -2px 0 #000,2px -2px 0 #000,-2px 2px 0 #000;animation:pulse 1s infinite alternate}
 #irreg .again #irregScore{font-size:16px;opacity:.9;margin-bottom:6px}
+#irregOpts{position:absolute;left:0;bottom:100px;width:100%;display:flex;justify-content:center;gap:24px;z-index:3}
 </style>
 </head>
 <body>
@@ -188,6 +190,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
   <div id="splash" class="screen">
     <div id="splashLogo" class="spr"></div>
     <div class="bar"><i id="loadFill"></i></div>
+    <div class="sm2" id="soundHint">Tap or click anywhere to turn the music on</div>
     <div class="sm" id="loadTxt">Loading… 0%</div>
   </div>
 
@@ -248,6 +251,7 @@ img.a{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;displa
     <div id="dgo" class="hidden"><div id="dgoImg" class="spr"></div></div>
     <div id="irreg" class="hidden">
       <div class="fb">An irregularity has been detected.<br>David is furious. You have been fired.</div>
+      <div id="irregOpts" class="hidden"><button class="gbtn small" id="bAgain">PLAY AGAIN</button><button class="gbtn small" id="bIrrMenu">MENU</button></div>
       <div class="again"><div id="irregScore"></div>Press any key or click anywhere to play again</div>
     </div>
   </div>
@@ -293,8 +297,7 @@ const CFG = {
   // David behaviour
   wanderMin: 6,  wanderMax: 10,   // seconds visible and wandering
   awayMin: 5,    awayMax: 8,      // seconds off-bounds (safe window)
-  ambushChance: 0.5,              // chance per hover on green while he is away
-  ambushDelay: 0.45,              // seconds before he pops back in
+  ambushChance: 0.5,              // chance, each time he goes off-bounds, that he comes back in front of you from the RIGHT
   ambushStay: 3.2,                // seconds he stays close on the right
   postAmbushAway: 4.5,            // safe window after the ambush
 
@@ -336,7 +339,7 @@ const PLAYERS = [
 const REASONS = ["hello","i love my family","yes","no","hi mom","good morning","i like pizza","pls dont ban me","ok","free tacos","nothing","i said please","water is wet","thank you","lol","sandwich","i love trains","have a nice day","my dog is cute","the number 7","tuesday","i did not do it","wholesome stuff only","123","bread","uhh","i just waved","happy birthday!","my cat is named bacon","i like your hat","...","good game","clouds","i like turtles","what","banana","blue is my favorite color","i am a good person","hello?","please and thank you"];
 
 const TIPS = {
-  intro:"Robloxians who are banned will come to you.\nYour job is to decide whether to remove the ban (GREEN) or terminate them (RED).\n\n"+CLICK+" a player to read their ban reason."+(isTouch?"\nTip: touch and HOLD the green button to see if David is waiting for you...":""),
+  intro:"Robloxians who are banned will come to you.\nYour job is to decide whether to remove the ban (GREEN) or terminate them (RED).\n\n"+CLICK+" a player to read their ban reason.",
   firstBan:"Roblox Players did not like that!\nBanning people makes the Playerbase angry.\nDon't ban everyone!",
   firstSaw:"David saw that!\nDavid likes his bans. Reversing one in front of him makes him ANGRY.\nWait until he looks away!",
   furious:"David is furious now!\nHe'll start peeking at the papers you read.\nOne more slip and it's game over!"
@@ -390,7 +393,7 @@ function attach(parent,file,label,quiet,cb){
 const AU={sfx:{},music:{}};
 function loadAudio(dir,file,loop){
   const a=new Audio(); a.preload='auto'; a.loop=!!loop; a.dataset.ok='1';
-  a.addEventListener('error',()=>{ a.dataset.ok='0'; });
+  a.addEventListener('error',()=>{ a.dataset.ok='0'; console.warn('Could not load audio file: '+a.src); });
   a.src=dir+file; try{ a.load(); }catch(e){}
   return a;
 }
@@ -398,7 +401,7 @@ Object.keys(SFX_FILES).forEach(k=>AU.sfx[k]=loadAudio(SFX_DIR,SFX_FILES[k],false
 Object.keys(MUSIC_FILES).forEach(k=>AU.music[k]=loadAudio(SFX_DIR,MUSIC_FILES[k],true));
 const VOL={music:.6,sfx:.8};
 try{ const s=JSON.parse(localStorage.getItem('bs2000vol')||'null'); if(s){ VOL.music=s.music; VOL.sfx=s.sfx; } }catch(e){}
-let unlocked=false, helpyHold=false, helpyAudio=null, curMusic=null, wantMusic='start';
+let unlocked=false, helpyHold=false, helpyAudio=null, curMusic=null, wantMusic='start', musicPlaying=false;
 const activeSfx=new Set();
 
 function sfx(name){
@@ -412,27 +415,40 @@ function sfx(name){
 }
 function stopAllSfx(){ activeSfx.forEach(a=>{ try{a.pause();}catch(e){} }); activeSfx.clear(); }
 function setMusicVol(){ Object.values(AU.music).forEach(m=>{ m.volume=VOL.music; }); }
+function kickMusic(){
+  if(!unlocked||helpyHold||!wantMusic||document.hidden) return;
+  const m=AU.music[wantMusic]; if(!m) return;
+  curMusic=m;
+  if(m.error){ m._tries=(m._tries||0)+1; if(m._tries>2) return; try{ m.load(); }catch(e){} }   // retry a file that failed once
+  m.volume=VOL.music;
+  const p=m.play();
+  if(p&&p.catch) p.catch(err=>console.warn('Music was blocked or failed ('+(err&&err.name)+'): '+m.src));
+}
 function playMusic(name){
   wantMusic=name;
-  if(!unlocked) return;
   const m=AU.music[name];
-  if(curMusic && curMusic!==m){ curMusic.pause(); try{curMusic.currentTime=0;}catch(e){} }
+  if(curMusic && curMusic!==m){ curMusic.pause(); try{curMusic.currentTime=0;}catch(e){} musicPlaying=false; }
   curMusic=m||null;
-  if(m && m.dataset.ok!=='0' && !helpyHold){ m.volume=VOL.music; if(m.paused){ const p=m.play(); if(p&&p.catch) p.catch(()=>{}); } }
+  kickMusic();
 }
 function stopMusic(){
-  wantMusic=null;
+  wantMusic=null; musicPlaying=false;
   if(curMusic){ curMusic.pause(); try{curMusic.currentTime=0;}catch(e){} }
   curMusic=null;
 }
-// browsers only allow sound after a first click / key press
-function unlockAudio(){ if(unlocked) return; unlocked=true; if(wantMusic) playMusic(wantMusic); }
-addEventListener('pointerdown',unlockAudio,true);
-addEventListener('keydown',unlockAudio,true);
+Object.values(AU.music).forEach(m=>m.addEventListener('playing',()=>{ if(m===curMusic) musicPlaying=true; }));
+function updSoundHint(){ const h=$('soundHint'); if(h) h.style.display=unlocked?'none':''; }
+// Browsers only allow sound after a real tap / click / key press. On touch screens a tap counts when you RELEASE
+// (pointerup / touchend / click), not on pointerdown - so listen to all of them and keep retrying until music plays.
+function gesture(e){
+  if(e.type==='pointerdown' && e.pointerType!=='mouse') return;
+  unlocked=true; updSoundHint();
+  if(!musicPlaying) kickMusic();
+}
+['pointerdown','pointerup','touchend','click','keydown'].forEach(t=>addEventListener(t,gesture,true));
 document.addEventListener('visibilitychange',()=>{
   if(!curMusic) return;
-  if(document.hidden) curMusic.pause();
-  else if(!helpyHold && unlocked){ const p=curMusic.play(); if(p&&p.catch) p.catch(()=>{}); }
+  if(document.hidden) curMusic.pause(); else kickMusic();
 });
 
 // Helpy: pauses all other music + sfx while a tip is open
@@ -446,7 +462,7 @@ function helpyStart(){
 function helpyEnd(){
   helpyHold=false;
   if(helpyAudio){ try{helpyAudio.pause();}catch(e){} helpyAudio=null; }
-  if(curMusic && unlocked){ const p=curMusic.play(); if(p&&p.catch) p.catch(()=>{}); }
+  kickMusic();
 }
 
 // hover.mp3 / click.mp3 for every button
@@ -512,6 +528,8 @@ $('bExit').onclick=()=>show('exitScr');
 $('exitScr').onclick=toMenu;
 $('bRetry').onclick=startGame;
 $('bMenu').onclick=toMenu;
+$('bAgain').onclick=()=>{ if(G.canRestart){ G.canRestart=false; startGame(); } };
+$('bIrrMenu').onclick=()=>{ G.canRestart=false; overToken++; toMenu(); };
 
 /* ---------------- game state ---------------- */
 let G={}, D={}, overToken=0;
@@ -524,14 +542,14 @@ const tipQueue=[];
 function startGame(){
   G={running:true,paused:false,over:false,comm:0,commShown:0,dav:0,davShown:0,rage:false,davIdx:0,
      player:null,paperOpen:false,decideT:0,processed:0,spawnT:0.6,tipsSeen:SEEN,tipOpen:false,readOnce:false,canRestart:false,lastAngry:-9};
-  D={mode:'away',t:rnd(2,4),tick:0};
+  D={mode:'away',t:rnd(2,4),tick:0,el:0,ambushAt:null,x:OFF_L,sc:1,dy:0};
   overToken++; tipQueue.length=0;
   stopAllSfx(); helpyHold=false; helpyAudio=null;
   show('game');
   $('over').classList.add('hidden');
   $('game').classList.remove('gameover-dav');
   $('thermoR').classList.remove('max');
-  $('dgo').classList.add('hidden'); $('irreg').classList.add('hidden'); $('dgoImg').classList.remove('zoom');
+  $('dgo').classList.add('hidden'); $('irreg').classList.add('hidden'); $('irregOpts').classList.add('hidden'); $('dgoImg').classList.remove('zoom');
   $('hint').textContent=CLICK+' the player to read their ban reason';
   $('paper').querySelector('.foot').textContent='('+CLICK.toLowerCase()+' to put down)';
   // layout numbers from CFG
@@ -573,49 +591,63 @@ $('tipOk').onclick=()=>{
 };
 
 /* ---------------- David ---------------- */
-// x = centre (stage px); scale 1 = "far away" (340px tall); dy pushes his feet down (closer to the desk)
-function davidSet(x,scale,rot,dur,dy){
-  const el=$('david'); el.style.setProperty('--d',dur+'s');
+// x = centre (stage px); scale 1 = "far away" (340px tall); dy pushes his feet down (closer to the desk).
+// Movement is LINEAR (no easing, no bobbing) at constant speed, like the cut-out in the original animation.
+const OFF_L=-260, OFF_R=1450, SPEED=150;   // off-bounds positions, walking speed in px/second
+function davidSet(x,scale,rot,dur,dy,durT){
+  const el=$('david'); D.x=x;
+  el.style.setProperty('--d',dur+'s'); el.style.setProperty('--dt',(durT||0)+'s');
   el.style.left=x+'px'; el.style.transform=`translateX(-50%) translateY(${dy||0}px) scale(${scale}) rotate(${rot}deg)`;
 }
 const watching=()=>['wander','ambush','peek'].includes(D.mode);
-function enterWander(){ D.mode='wander'; D.t=rnd(CFG.wanderMin,CFG.wanderMax); D.tick=0; }
-function enterAway(t){ D.mode='away'; D.t=t||rnd(CFG.awayMin,CFG.awayMax); davidSet(-260,1,0,1.0,0); }
+function setDepth(){ const d=Math.random(); D.sc=1+.5*d; D.dy=70*d; }       // how "close" he is for this whole wander
+function wanderLeg(fromX,smooth){
+  const x=rnd(260,1020), dur=Math.max(.8,Math.abs(x-fromX)/SPEED);
+  D.tick=dur+rnd(.3,1.2);                                                   // walk, then stand still a moment
+  davidSet(x,D.sc,0,dur,D.dy,smooth?dur:0);
+}
+// fromVisible: he is already on screen (after the rage / peeking) so he walks from where he is;
+// otherwise he is placed off-bounds on the left (unseen) and walks in.
+function enterWander(fromVisible){
+  D.mode='wander'; D.t=rnd(CFG.wanderMin,CFG.wanderMax); D.ambushAt=null; setDepth();
+  if(fromVisible) wanderLeg(D.x,true);
+  else{ davidSet(OFF_L,D.sc,0,0,D.dy,0); $('david').offsetWidth; wanderLeg(OFF_L,false); }
+}
+// Off-bounds ("not looking"). side 'right' = leaving after an ambush. Each time he goes away to the left there is a
+// CFG.ambushChance that, at a random moment of that window, he comes back IN FRONT of you from the right.
+function enterAway(t,side,noAmbush){
+  D.mode='away'; D.t=t||rnd(CFG.awayMin,CFG.awayMax); D.el=0;
+  const right=side==='right';
+  davidSet(right?OFF_R:OFF_L, right?1.73:D.sc, 0, 1.0, right?120:D.dy, 0);
+  D.ambushAt=(!right && !noAmbush && Math.random()<CFG.ambushChance) ? rnd(1.0,Math.max(1.2,D.t-1.5)) : null;
+}
 function enterAmbush(){
-  D.mode='ambush'; D.t=CFG.ambushStay;
-  davidSet(1450,1.73,0,0.01,120); $('david').offsetWidth; davidSet(990,1.73,0,0.35,120);   // pops in close, on the right
+  D.mode='ambush'; D.t=CFG.ambushStay; D.ambushAt=null;
+  davidSet(OFF_R,1.73,0,0,120,0); $('david').offsetWidth;     // placed unseen, off-bounds on the right...
+  davidSet(990,1.73,0,.5,120,0);                              // ...then walks in close
 }
 function enterPeek(){
-  D.mode='peek'; const left=Math.random()<.5;
-  davidSet(left?P.l+25:P.l+P.w-25,1.5,left?-45:45,0.5,40);
+  D.mode='peek'; D.ambushAt=null; const left=Math.random()<.5;
+  davidSet(left?P.l+25:P.l+P.w-25,1.5,left?-45:45,.4,40,.4);
 }
 function updateDavid(dt){
   const want=G.paperOpen && G.dav>=CFG.peekAt;
   if(want && D.mode!=='peek') enterPeek();
-  else if(!want && D.mode==='peek') enterWander();
+  else if(!want && D.mode==='peek') enterWander(true);
   D.t-=dt;
   switch(D.mode){
     case 'wander':
-      D.tick-=dt;
-      if(D.tick<=0){ D.tick=rnd(2,3.2); const d=Math.random(); davidSet(rnd(260,1020),1+.5*d,0,D.tick*.95,70*d); }
+      D.tick-=dt; if(D.tick<=0) wanderLeg(D.x,false);
       if(D.t<=0) enterAway();
       break;
-    case 'away': if(D.t<=0) enterWander(); break;
-    case 'pending': if(D.t<=0) enterAmbush(); break;
-    case 'ambush': if(D.t<=0 && !G.rage) enterAway(CFG.postAmbushAway); break;
+    case 'away':
+      D.el+=dt;
+      if(D.ambushAt!=null && D.el>=D.ambushAt) enterAmbush();
+      else if(D.t<=0) enterWander(false);
+      break;
+    case 'ambush': if(D.t<=0 && !G.rage) enterAway(CFG.postAmbushAway,'right'); break;
   }
 }
-// Mouse: hovering the green button rolls the ambush chance.
-// Touch has no hover, so pressing (touch-and-hold) the green button counts as hovering,
-// and David appears instantly so he is already there when you release.
-function tryAmbush(instant){
-  if(!G.running||G.paused||G.over) return;
-  if(D.mode==='away' && Math.random()<CFG.ambushChance){
-    if(instant) enterAmbush(); else { D.mode='pending'; D.t=CFG.ambushDelay; }
-  }
-}
-$('btnOk').addEventListener('pointerenter',e=>{ if(e.pointerType==='mouse') tryAmbush(false); });
-$('btnOk').addEventListener('pointerdown',e=>{ if(e.pointerType!=='mouse') tryAmbush(true); });
 
 /* ---------------- players & paper ---------------- */
 function spawnPlayer(){
@@ -703,7 +735,7 @@ function lose(cause){
       $('irreg').classList.remove('hidden'); $('dgo').classList.add('hidden');
     },800+720);
     // 4) any key / click restarts (small delay so you don't skip it by accident)
-    setTimeout(()=>{ if(alive()) G.canRestart=true; },800+720+600);
+    setTimeout(()=>{ if(alive()){ G.canRestart=true; $('irregOpts').classList.remove('hidden'); } },800+720+600);
   }else{
     $('overMsg').innerHTML='The Roblox community has had enough.<br>You have been replaced.';
     $('overScore').textContent=score;
@@ -713,7 +745,7 @@ function lose(cause){
 function tryRestart(e){
   if(!G.canRestart) return;
   if(e.type==='keydown' && (e.code==='KeyF'||e.ctrlKey||e.metaKey||e.altKey)) return;
-  if(e.target && e.target.closest && e.target.closest('#fsBtn')) return;
+  if(e.target && e.target.closest && e.target.closest('#fsBtn,#irregOpts')) return;
   G.canRestart=false; startGame();
 }
 addEventListener('keydown',tryRestart); addEventListener('pointerdown',tryRestart);
@@ -737,7 +769,7 @@ function frame(now){
     if(!G.rage && G.dav<100) G.dav=Math.max(0,G.dav-CFG.davidCooldown*dt);   // a full meter never drains
     G.commShown=approach(G.commShown,G.comm,CFG.meterRate,60,dt);
     G.davShown=approach(G.davShown,G.dav,G.rage?CFG.rageRate:CFG.meterRate,60,dt);
-    if(G.rage && G.davShown>=G.dav-.01){ G.rage=false; if(D.mode==='ambush') enterWander(); }
+    if(G.rage && G.davShown>=G.dav-.01){ G.rage=false; if(D.mode==='ambush') enterWander(true); }
     renderMeters();
     if(G.dav>=CFG.furiousAt && G.dav<100) showTip('furious');
     if(G.davShown>=99.5) lose('david');
@@ -749,7 +781,8 @@ function frame(now){
 }
 requestAnimationFrame(frame);
 
-window.BS={CFG,get G(){return G},get D(){return D},decide,startGame,openPaper,closePaper,enterAway,enterWander,sfx,unlockAudio};
+window.BS={CFG,get G(){return G},get D(){return D},decide,startGame,openPaper,closePaper,enterAway,enterWander,sfx,
+  get music(){return curMusic},get musicPlaying(){return musicPlaying}};
 </script>
 </body>
 </html>
